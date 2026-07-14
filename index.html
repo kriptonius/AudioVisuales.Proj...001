@@ -20,7 +20,7 @@
 
     /* Box Salvatore */
     .box-salvatore {
-      position: relative; /* CRUCIAL para que el botón de WhatsApp se posicione bien */
+      position: relative;
       background: rgba(30, 41, 59, 0.7);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
@@ -128,12 +128,27 @@
       cursor: pointer;
       margin-top: 10px;
     }
+
+    .btn-toggle-audio {
+      padding: 12px 24px;
+      border-radius: 12px;
+      border: none;
+      background: #38bdf8;
+      color: #0f172a;
+      font-weight: bold;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-toggle-audio:hover {
+      background: #0ea5e9;
+    }
   </style>
 </head>
 <body>
 
   <div class="box-salvatore">
-    <!-- Botón WhatsApp -->
     <a href="https://wa.me/51963845681" target="_blank" class="whatsapp-btn" title="Contactar por WhatsApp">
       <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 21.602c-2.64 0-5.28-.68-7.56-1.97l-.54-.32-5.6 1.47 1.49-5.46-.35-.57C1.5 11.23 1.5 8.35 3.32 6.15c1.82-2.2 4.79-3.41 7.89-3.41 2.11 0 4.12.54 5.92 1.61 1.8 1.07 3.16 2.59 3.96 4.45.8 1.86.99 3.86.55 5.75-.44 1.89-1.47 3.56-3.03 4.85-1.56 1.3-3.49 1.99-5.6 1.99z"/></svg>
     </a>
@@ -153,32 +168,67 @@
     </div>
 
     <div id="playerContainer" class="player-container">
-      <div id="playerTitle" style="color: #38bdf8; font-size: 0.9rem; margin-bottom: 10px;">Reproduciendo</div>
+      <div id="playerTitle" style="color: #38bdf8; font-size: 0.9rem; margin-bottom: 12px; font-weight: 600;">Reproduciendo</div>
       <div id="mediaSpace"></div>
       <button class="btn-stop" onclick="stopAll()">Cerrar</button>
     </div>
   </div>
 
   <script>
-    /* (Scripts anteriores se mantienen igual para la funcionalidad) */
+    // Variable global para controlar el reproductor de audio
+    window.currentAudio = null;
+
     function stopAll() {
-      if (window.currentAudio) { window.currentAudio.pause(); window.currentAudio = null; }
+      if (window.currentAudio) { 
+        window.currentAudio.pause(); 
+        window.currentAudio = null; 
+      }
       document.getElementById('mediaSpace').innerHTML = '';
       document.getElementById('playerContainer').style.display = 'none';
     }
+
     function playAudio(url, name) {
       stopAll();
       document.getElementById('playerTitle').textContent = "Escuchando: " + name;
       document.getElementById('playerContainer').style.display = 'block';
-      document.getElementById('mediaSpace').innerHTML = `<button style="padding:10px 20px; border-radius:10px; border:none; background:#38bdf8;" onclick="toggle()">Play/Pause</button>`;
+      
+      // Creamos la interfaz con la función toggle() correctamente enlazada
+      document.getElementById('mediaSpace').innerHTML = `
+        <div style="margin-bottom: 10px;">
+          <button class="btn-toggle-audio" id="btnToggle" onclick="toggleAudio()">Pausar ❚❚</button>
+        </div>
+      `;
+      
       window.currentAudio = new Audio(url);
-      window.currentAudio.play();
+      window.currentAudio.play().catch(err => {
+        console.log("Auto-play bloqueado por el navegador, requiere interacción.");
+        document.getElementById('btnToggle').textContent = "Reproducir ▶";
+      });
     }
+
+    // Función corregida para pausar y reanudar la música en vivo
+    function toggleAudio() {
+      const btn = document.getElementById('btnToggle');
+      if (window.currentAudio) {
+        if (window.currentAudio.paused) {
+          window.currentAudio.play();
+          btn.textContent = "Pausar ❚❚";
+        } else {
+          window.currentAudio.pause();
+          btn.textContent = "Reproducir ▶";
+        }
+      }
+    }
+
     function playVideo(url, name) {
       stopAll();
       document.getElementById('playerTitle').textContent = "Viendo: " + name;
       document.getElementById('playerContainer').style.display = 'block';
-      document.getElementById('mediaSpace').innerHTML = `<div class="video-frame-wrapper"><iframe src="${url}"></iframe></div>`;
+      document.getElementById('mediaSpace').innerHTML = `
+        <div class="video-frame-wrapper">
+          <iframe src="${url}" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        </div>
+      `;
     }
   </script>
 </body>
