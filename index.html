@@ -74,16 +74,7 @@
     /* Botonera */
     .button-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
 
-    /* Cuadrícula para las Radios (2 arriba, 2 abajo) */
-    .radio-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 6px;
-    }
-
-    /* Cuadrícula para los Canales de TV (2 columnas) */
-    .tv-grid {
+    .radio-grid, .tv-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
@@ -105,7 +96,6 @@
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
 
-    /* Botones cuadrados */
     .btn-square {
       aspect-ratio: 1 / 1;
       flex-direction: column;
@@ -115,42 +105,42 @@
       text-align: center;
     }
 
-    .btn-square span.icon {
-      font-size: 1.6rem;
-    }
-
+    .btn-square span.icon { font-size: 1.6rem; }
     .btn:hover { transform: translateY(-2px); }
 
-    /* Colores de los botones de Radio */
+    /* Colores de los botones */
     .btn-rpp { background: linear-gradient(135deg, #0d3b66 0%, #001e3d 100%); }
     .btn-ritmo { background: linear-gradient(135deg, #ec4899 0%, #be185d 100%); }
     .btn-garden { background: linear-gradient(135deg, #10b981 0%, #047857 100%); }
-    .btn-la92 { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
-    
-    /* Colores de los botones de TV */
+    .btn-la90 { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); } /* Actualizado a La 90 */
     .btn-america { background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); }
     .btn-famelack { background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%); }
 
     /* Reproductor / Contenedor Embebido */
     .player-container {
-      background: rgba(15, 23, 42, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 16px;
       padding: 20px;
       margin-top: 15px;
       display: none;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .video-frame-wrapper {
       position: relative;
-      padding-bottom: 56.25%; /* Relación de aspecto 16:9 estándar */
+      padding-bottom: 56.25%; /* 16:9 */
       height: 0;
       overflow: hidden;
       border-radius: 12px;
       background: #000;
     }
 
-    /* Ajuste especial para páginas completas interactiva como Radio Garden */
     .video-frame-wrapper.large-frame {
       padding-bottom: 85%; 
     }
@@ -159,16 +149,49 @@
       position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;
     }
 
+    .audio-wrapper {
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .audio-wrapper audio {
+      width: 100%;
+      max-width: 400px;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+
     .btn-stop {
       background: rgba(239, 68, 68, 0.2);
       color: #f87171;
       border: 1px solid rgba(239, 68, 68, 0.4);
-      padding: 6px 12px;
+      padding: 8px 16px;
       border-radius: 8px;
-      font-size: 0.75rem;
+      font-size: 0.85rem;
+      font-weight: 600;
       cursor: pointer;
-      margin-top: 10px;
+      margin-top: 15px;
+      transition: all 0.2s;
+      width: 100%;
     }
+
+    .btn-stop:hover {
+      background: rgba(239, 68, 68, 0.4);
+      color: #fff;
+    }
+
+    .fallback-link {
+      display: block;
+      margin-top: 10px;
+      color: #38bdf8;
+      font-size: 0.75rem;
+      text-decoration: underline;
+      text-align: center;
+    }
+    
+    .fallback-link:hover { color: #7dd3fc; }
   </style>
 </head>
 <body>
@@ -184,72 +207,104 @@
     <div class="button-group">
       <!-- CUADRÍCULA 2x2 PARA LAS RADIOS -->
       <div class="radio-grid">
-        <!-- 1. RPP (Vía Radio Browser / Stream Directo) -->
-        <button class="btn btn-square btn-rpp" onclick="playEmbed('https://audio.gruporpp.pe/live/rpp/mp3/icecast.audio', 'RPP', false)">
+        <!-- 1. RPP (Stream directo de audio) -->
+        <button class="btn btn-square btn-rpp" onclick="playMedia('https://stream.zeno.fm/0r0xa792kwzuv', 'RPP Noticias', true)">
           <span class="icon">📻</span>
           <span>RPP</span>
         </button>
 
-        <!-- 2. Radio Ritmo Romántica (Vía Radio Browser / Stream Directo) -->
-        <button class="btn btn-square btn-ritmo" onclick="playEmbed('https://stream.crpradios.pe/ritmoromantica.mp3', 'Ritmo Romántica', false)">
+        <!-- 2. Radio Ritmo Romántica (Stream directo de audio) -->
+        <button class="btn btn-square btn-ritmo" onclick="playMedia('https://stream.crpradios.pe/ritmoromantica.mp3', 'Ritmo Romántica', true)">
           <span class="icon">💝</span>
           <span>Ritmo Romántica</span>
         </button>
 
-        <!-- 3. Radio Garden (Globo Interactivo) -->
-        <button class="btn btn-square btn-garden" onclick="playEmbed('https://radio.garden/', 'Radio Garden', true)">
+        <!-- 3. Radio Garden (Web embebida) -->
+        <button class="btn btn-square btn-garden" onclick="playMedia('https://radio.garden/', 'Radio Garden', false, true)">
           <span class="icon">🌍</span>
           <span>Radio Garden</span>
         </button>
 
-        <!-- 4. La92 / La Zona (Vía la92entera.com / Stream de audio correspondiente) -->
-        <button class="btn btn-square btn-la92" onclick="playEmbed('https://stream.crpradios.pe/lazona.mp3', 'La 92 Entera', false)">
-          <span class="icon">⚡</span>
-          <span>La 92 Entera</span>
+        <!-- 4. La Noventa Entera (Web embebida) -->
+        <button class="btn btn-square btn-la90" onclick="playMedia('https://lanoventera.com/', 'La Noventa Entera', false)">
+          <span class="icon">🎵</span>
+          <span>La Noventa Entera</span>
         </button>
       </div>
 
       <!-- CUADRÍCULA PARA LOS CANALES DE TELEVISIÓN -->
       <div class="tv-grid">
-        <!-- América TV (Intacto) -->
-        <button class="btn btn-america" onclick="playEmbed('https://tvgo.americatv.com.pe/', 'América TV En Vivo', false)">
+        <!-- América TV -->
+        <button class="btn btn-america" onclick="playMedia('https://tvgo.americatv.com.pe/', 'América TV En Vivo', false)">
           <span>América TV en vivo</span>
         </button>
 
         <!-- Famelack TV -->
-        <button class="btn btn-famelack" onclick="playEmbed('https://share.google/lJ50MFKpcuF705hTc', 'Famelack Live TV', false)">
+        <button class="btn btn-famelack" onclick="playMedia('https://famelack.com/', 'Famelack Live TV', false)">
           <span>Famelack TV</span>
         </button>
       </div>
     </div>
 
     <div id="playerContainer" class="player-container">
-      <div id="playerTitle" style="color: #38bdf8; font-size: 0.9rem; margin-bottom: 10px;">Cargando...</div>
+      <div id="playerTitle" style="color: #38bdf8; font-size: 0.95rem; font-weight: 600; margin-bottom: 15px;">Cargando...</div>
       <div id="mediaSpace"></div>
-      <button class="btn-stop" onclick="stopAll()">Cerrar</button>
+      <button class="btn-stop" onclick="stopAll()">⏹ Detener y Cerrar</button>
     </div>
   </div>
 
   <script>
     function stopAll() {
-      document.getElementById('mediaSpace').innerHTML = '';
+      const mediaSpace = document.getElementById('mediaSpace');
+      mediaSpace.innerHTML = ''; // Destruye el iframe o audio para detener la reproducción
       document.getElementById('playerContainer').style.display = 'none';
+      document.getElementById('playerTitle').textContent = 'Cargando...';
     }
     
-    // Función unificada para cargar transmisiones y páginas web dentro del contenedor
-    function playEmbed(url, name, isLarge) {
+    /**
+     * Función unificada para cargar transmisiones.
+     * @param {string} url - La URL del stream o sitio web.
+     * @param {string} name - Nombre a mostrar.
+     * @param {boolean} isAudio - Si es true, usa la etiqueta <audio> nativa (mucho más fiable para radios).
+     * @param {boolean} isLarge - Si es true, aplica un aspecto más alto (para Radio Garden).
+     */
+    function playMedia(url, name, isAudio, isLarge = false) {
       stopAll();
-      document.getElementById('playerTitle').textContent = name;
+      document.getElementById('playerTitle').textContent = `▶ Reproduciendo: ${name}`;
       document.getElementById('playerContainer').style.display = 'block';
       
-      // Aplicar una altura mayor si es una herramienta interactiva como el mapa de Radio Garden
-      const frameClass = isLarge ? "video-frame-wrapper large-frame" : "video-frame-wrapper";
+      const mediaSpace = document.getElementById('mediaSpace');
       
-      document.getElementById('mediaSpace').innerHTML = `
-        <div class="${frameClass}">
-          <iframe src="${url}" allow="autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        </div>
-      `;
+      if (isAudio) {
+        // Usar <audio> nativo para streams MP3/HLS. Es 100% fiable y no lo bloquean los navegadores.
+        mediaSpace.innerHTML = `
+          <div class="audio-wrapper">
+            <p style="color: #cbd5e1; font-size: 0.85rem; margin-bottom: 10px;">Stream de audio en vivo</p>
+            <audio controls autoplay name="media">
+              <source src="${url}" type="audio/mpeg">
+              <source src="${url}" type="audio/aac">
+              Tu navegador no soporta la reproducción de audio HTML5.
+            </audio>
+            <p style="color: #94a3b8; font-size: 0.75rem; margin-top: 12px;">💡 Si no inicia automáticamente, haz clic en el botón "Play" del reproductor.</p>
+          </div>
+        `;
+      } else {
+        // Usar <iframe> para sitios web completos (Radio Garden, TV, Famelack, La Noventa Entera)
+        const frameClass = isLarge ? "video-frame-wrapper large-frame" : "video-frame-wrapper";
+        mediaSpace.innerHTML = `
+          <div class="${frameClass}">
+            <iframe 
+              src="${url}" 
+              allow="autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" 
+              allowfullscreen 
+              sandbox="allow-same-origin allow-scripts allow-popups allow-forms">
+            </iframe>
+          </div>
+          <a href="${url}" target="_blank" class="fallback-link">
+            ⚠️ Si la pantalla se queda en blanco, haz clic aquí para abrir en una nueva pestaña
+          </a>
+        `;
+      }
     }
   </script>
 </body>
