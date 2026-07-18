@@ -33,7 +33,7 @@
       text-align: center;
     }
 
-    /* Botón de WhatsApp - Posición Absoluta */
+    /* Botón de WhatsApp */
     .whatsapp-btn {
       position: absolute;
       top: 20px;
@@ -74,6 +74,22 @@
     /* Botonera */
     .button-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
 
+    /* Cuadrícula para las Radios (2 arriba, 2 abajo) */
+    .radio-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+
+    /* Cuadrícula para los Canales de TV (2 columnas) */
+    .tv-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+
     .btn {
       display: flex;
       align-items: center;
@@ -89,13 +105,33 @@
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
 
+    /* Botones cuadrados */
+    .btn-square {
+      aspect-ratio: 1 / 1;
+      flex-direction: column;
+      justify-content: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      text-align: center;
+    }
+
+    .btn-square span.icon {
+      font-size: 1.6rem;
+    }
+
     .btn:hover { transform: translateY(-2px); }
 
-    .btn-radiomar { background: linear-gradient(135deg, #f97316 0%, #c2410c 100%); }
-    .btn-exitosa { background: linear-gradient(135deg, #06b6d4 0%, #0369a1 100%); }
+    /* Colores de los botones de Radio */
+    .btn-rpp { background: linear-gradient(135deg, #0d3b66 0%, #001e3d 100%); }
+    .btn-ritmo { background: linear-gradient(135deg, #ec4899 0%, #be185d 100%); }
+    .btn-garden { background: linear-gradient(135deg, #10b981 0%, #047857 100%); }
+    .btn-la92 { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+    
+    /* Colores de los botones de TV */
     .btn-america { background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); }
+    .btn-famelack { background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%); }
 
-    /* Reproductor */
+    /* Reproductor / Contenedor Embebido */
     .player-container {
       background: rgba(15, 23, 42, 0.6);
       border: 1px solid rgba(255, 255, 255, 0.05);
@@ -107,11 +143,16 @@
 
     .video-frame-wrapper {
       position: relative;
-      padding-bottom: 56.25%;
+      padding-bottom: 56.25%; /* Relación de aspecto 16:9 estándar */
       height: 0;
       overflow: hidden;
       border-radius: 12px;
       background: #000;
+    }
+
+    /* Ajuste especial para páginas completas interactiva como Radio Garden */
+    .video-frame-wrapper.large-frame {
+      padding-bottom: 85%; 
     }
 
     .video-frame-wrapper iframe {
@@ -128,27 +169,12 @@
       cursor: pointer;
       margin-top: 10px;
     }
-
-    .btn-toggle-audio {
-      padding: 12px 24px;
-      border-radius: 12px;
-      border: none;
-      background: #38bdf8;
-      color: #0f172a;
-      font-weight: bold;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .btn-toggle-audio:hover {
-      background: #0ea5e9;
-    }
   </style>
 </head>
 <body>
 
   <div class="box-salvatore">
+    <!-- Botón WhatsApp -->
     <a href="https://wa.me/51963845681" target="_blank" class="whatsapp-btn" title="Contactar por WhatsApp">
       <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 21.602c-2.64 0-5.28-.68-7.56-1.97l-.54-.32-5.6 1.47 1.49-5.46-.35-.57C1.5 11.23 1.5 8.35 3.32 6.15c1.82-2.2 4.79-3.41 7.89-3.41 2.11 0 4.12.54 5.92 1.61 1.8 1.07 3.16 2.59 3.96 4.45.8 1.86.99 3.86.55 5.75-.44 1.89-1.47 3.56-3.03 4.85-1.56 1.3-3.49 1.99-5.6 1.99z"/></svg>
     </a>
@@ -156,77 +182,72 @@
     <h1 class="box-title">Salvatore</h1>
     
     <div class="button-group">
-      <button class="btn btn-radiomar" onclick="playAudio('https://stream.crpradios.pe/radiomar.mp3', 'Radio Mar Plus')">
-        <span>Radio Mar Plus</span>
-      </button>
-      <button class="btn btn-exitosa" onclick="playAudio('https://streaming.exitosa.pe/radio/8000/exitosa.mp3', 'Radio Exitosa')">
-        <span>Radio Exitosa</span>
-      </button>
-      <button class="btn btn-america" onclick="playVideo('https://tvgo.americatv.com.pe/', 'América TV En Vivo')">
-        <span>América TV en vivo</span>
-      </button>
+      <!-- CUADRÍCULA 2x2 PARA LAS RADIOS -->
+      <div class="radio-grid">
+        <!-- 1. RPP (Vía Radio Browser / Stream Directo) -->
+        <button class="btn btn-square btn-rpp" onclick="playEmbed('https://audio.gruporpp.pe/live/rpp/mp3/icecast.audio', 'RPP', false)">
+          <span class="icon">📻</span>
+          <span>RPP</span>
+        </button>
+
+        <!-- 2. Radio Ritmo Romántica (Vía Radio Browser / Stream Directo) -->
+        <button class="btn btn-square btn-ritmo" onclick="playEmbed('https://stream.crpradios.pe/ritmoromantica.mp3', 'Ritmo Romántica', false)">
+          <span class="icon">💝</span>
+          <span>Ritmo Romántica</span>
+        </button>
+
+        <!-- 3. Radio Garden (Globo Interactivo) -->
+        <button class="btn btn-square btn-garden" onclick="playEmbed('https://radio.garden/', 'Radio Garden', true)">
+          <span class="icon">🌍</span>
+          <span>Radio Garden</span>
+        </button>
+
+        <!-- 4. La92 / La Zona (Vía la92entera.com / Stream de audio correspondiente) -->
+        <button class="btn btn-square btn-la92" onclick="playEmbed('https://stream.crpradios.pe/lazona.mp3', 'La 92 Entera', false)">
+          <span class="icon">⚡</span>
+          <span>La 92 Entera</span>
+        </button>
+      </div>
+
+      <!-- CUADRÍCULA PARA LOS CANALES DE TELEVISIÓN -->
+      <div class="tv-grid">
+        <!-- América TV (Intacto) -->
+        <button class="btn btn-america" onclick="playEmbed('https://tvgo.americatv.com.pe/', 'América TV En Vivo', false)">
+          <span>América TV en vivo</span>
+        </button>
+
+        <!-- Famelack TV -->
+        <button class="btn btn-famelack" onclick="playEmbed('https://share.google/lJ50MFKpcuF705hTc', 'Famelack Live TV', false)">
+          <span>Famelack TV</span>
+        </button>
+      </div>
     </div>
 
     <div id="playerContainer" class="player-container">
-      <div id="playerTitle" style="color: #38bdf8; font-size: 0.9rem; margin-bottom: 12px; font-weight: 600;">Reproduciendo</div>
+      <div id="playerTitle" style="color: #38bdf8; font-size: 0.9rem; margin-bottom: 10px;">Cargando...</div>
       <div id="mediaSpace"></div>
       <button class="btn-stop" onclick="stopAll()">Cerrar</button>
     </div>
   </div>
 
   <script>
-    // Variable global para controlar el reproductor de audio
-    window.currentAudio = null;
-
     function stopAll() {
-      if (window.currentAudio) { 
-        window.currentAudio.pause(); 
-        window.currentAudio = null; 
-      }
       document.getElementById('mediaSpace').innerHTML = '';
       document.getElementById('playerContainer').style.display = 'none';
     }
-
-    function playAudio(url, name) {
+    
+    // Función unificada para cargar transmisiones y páginas web dentro del contenedor
+    function playEmbed(url, name, isLarge) {
       stopAll();
-      document.getElementById('playerTitle').textContent = "Escuchando: " + name;
+      document.getElementById('playerTitle').textContent = name;
       document.getElementById('playerContainer').style.display = 'block';
       
-      // Creamos la interfaz con la función toggle() correctamente enlazada
-      document.getElementById('mediaSpace').innerHTML = `
-        <div style="margin-bottom: 10px;">
-          <button class="btn-toggle-audio" id="btnToggle" onclick="toggleAudio()">Pausar ❚❚</button>
-        </div>
-      `;
+      // Aplicar una altura mayor si es una herramienta interactiva como el mapa de Radio Garden
+      const frameClass = isLarge ? "video-frame-wrapper large-frame" : "video-frame-wrapper";
       
-      window.currentAudio = new Audio(url);
-      window.currentAudio.play().catch(err => {
-        console.log("Auto-play bloqueado por el navegador, requiere interacción.");
-        document.getElementById('btnToggle').textContent = "Reproducir ▶";
-      });
-    }
-
-    // Función corregida para pausar y reanudar la música en vivo
-    function toggleAudio() {
-      const btn = document.getElementById('btnToggle');
-      if (window.currentAudio) {
-        if (window.currentAudio.paused) {
-          window.currentAudio.play();
-          btn.textContent = "Pausar ❚❚";
-        } else {
-          window.currentAudio.pause();
-          btn.textContent = "Reproducir ▶";
-        }
-      }
-    }
-
-    function playVideo(url, name) {
-      stopAll();
-      document.getElementById('playerTitle').textContent = "Viendo: " + name;
-      document.getElementById('playerContainer').style.display = 'block';
       document.getElementById('mediaSpace').innerHTML = `
-        <div class="video-frame-wrapper">
-          <iframe src="${url}" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        <div class="${frameClass}">
+          <iframe src="${url}" allow="autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
       `;
     }
