@@ -213,14 +213,14 @@
 
     <div class="button-group">
       <div class="radio-grid">
-        <!-- 1. RPP: reproductor oficial embebible de Zeno.fm (no la URL de stream cruda) -->
-        <button class="btn btn-square btn-rpp" onclick="playAudio('https://zeno.fm/player/studio-rpp', 'RPP Noticias', true)">
+        <!-- 1. RPP: se busca el stream real y vivo vía Radio-Browser API -->
+        <button class="btn btn-square btn-rpp" onclick="playViaRadioBrowser('RPP', 'RPP Noticias', 'https://www.rpp.pe/')">
           <span class="icon">📻</span>
           <span>RPP</span>
         </button>
 
-        <!-- 2. Ritmo Romántica: audio directo con fallback si la URL caducó -->
-        <button class="btn btn-square btn-ritmo" onclick="playAudio('https://stream.crpradios.pe/ritmoromantica.mp3', 'Ritmo Romántica', false, 'https://www.ritmoromantica.pe/')">
+        <!-- 2. Ritmo Romántica: se busca el stream real y vivo vía Radio-Browser API -->
+        <button class="btn btn-square btn-ritmo" onclick="playViaRadioBrowser('Ritmo Romantica', 'Ritmo Romántica', 'https://www.ritmoromantica.pe/')">
           <span class="icon">💝</span>
           <span>Ritmo Romántica</span>
         </button>
@@ -274,6 +274,87 @@
     // Abre sitios que no se pueden embeber por seguridad (X-Frame-Options / CSP)
     function openExternal(url) {
       window.open(url, '_blank', 'noopener');
+    }
+
+    // Servidores espejo de la API de Radio-Browser (radio-browser.info).
+    // Es una base de datos comunitaria de streams reales, verificados en vivo,
+    // por eso resuelve el problema de las URLs de stream que caducan.
+    const RADIO_BROWSER_SERVERS = [
+      "https://de1.api.radio-browser.info",
+      "https://de2.api.radio-browser.info",
+      "https://at1.api.radio-browser.info",
+      "https://nl1.api.radio-browser.info",
+    ];
+
+    async function fetchStationFromRadioBrowser(name) {
+      const params = new URLSearchParams({
+        name,
+        limit: "10",
+        hidebroken: "true",
+        order: "clickcount",
+        reverse: "true",
+        countrycode: "PE",
+      });
+      for (const server of RADIO_BROWSER_SERVERS) {
+        try {
+          const res = await fetch(`${server}/json/stations/search?${params.toString()}`);
+          if (!res.ok) continue;
+          const data = await res.json();
+          const valid = (data || []).filter(s => s.url_resolved);
+          if (valid.length > 0) return valid[0];
+        } catch (e) {
+          // probamos el siguiente servidor espejo
+        }
+      }
+      return null;
+    }
+
+    /**
+     * Busca una emisora peruana real y vigente vía Radio-Browser API y la reproduce.
+     * @param {string} searchName - nombre para buscar en Radio-Browser (ej. "RPP").
+     * @param {string} displayName - nombre a mostrar en pantalla.
+     * @param {string} fallbackSiteUrl - web oficial a abrir si no se encuentra ningún stream.
+     */
+    async function playViaRadioBrowser(searchName, displayName, fallbackSiteUrl) {
+      stopAll();
+      document.getElementById('playerTitle').textContent = `🔎 Buscando: ${displayName}...`;
+      document.getElementById('playerContainer').style.display = 'block';
+
+      const mediaSpace = document.getElementById('mediaSpace');
+      const errorBox = document.getElementById('errorBox');
+      mediaSpace.innerHTML = `<div class="audio-wrapper"><p style="color:#94a3b8; font-size:0.85rem;">Consultando emisoras en vivo…</p></div>`;
+
+      const station = await fetchStationFromRadioBrowser(searchName);
+
+      if (!station) {
+        document.getElementById('playerTitle').textContent = `⚠ ${displayName}`;
+        errorBox.style.display = 'block';
+        errorBox.innerHTML = `
+          No se encontró un stream en vivo para ${displayName} en este momento.
+          <br><a href="${fallbackSiteUrl}" target="_blank">Abrir ${displayName} en su web oficial →</a>
+        `;
+        mediaSpace.innerHTML = '';
+        return;
+      }
+
+      document.getElementById('playerTitle').textContent = `▶ Reproduciendo: ${station.name}`;
+      mediaSpace.innerHTML = `
+        <div class="audio-wrapper">
+          <p style="color: #cbd5e1; font-size: 0.85rem; margin-bottom: 10px;">Stream de audio en vivo</p>
+          <audio id="audioEl" controls autoplay>
+            <source src="${station.url_resolved}">
+          </audio>
+        </div>
+      `;
+
+      const audioEl = document.getElementById('audioEl');
+      audioEl.addEventListener('error', () => {
+        errorBox.style.display = 'block';
+        errorBox.innerHTML = `
+          Ese stream no respondió (puede estar caído ahora mismo).
+          <br><a href="${fallbackSiteUrl}" target="_blank">Abrir ${displayName} en su web oficial →</a>
+        `;
+      });
     }
 
     /**
