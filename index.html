@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Salvatore - Player & WhatsApp</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  
+
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
 
@@ -18,7 +18,6 @@
       padding: 20px;
     }
 
-    /* Box Salvatore */
     .box-salvatore {
       position: relative;
       background: rgba(30, 41, 59, 0.7);
@@ -33,7 +32,6 @@
       text-align: center;
     }
 
-    /* Botón de WhatsApp */
     .whatsapp-btn {
       position: absolute;
       top: 20px;
@@ -71,7 +69,6 @@
       text-transform: uppercase;
     }
 
-    /* Botonera */
     .button-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
 
     .radio-grid, .tv-grid {
@@ -103,20 +100,27 @@
       gap: 8px;
       font-size: 0.85rem;
       text-align: center;
+      position: relative;
     }
 
     .btn-square span.icon { font-size: 1.6rem; }
     .btn:hover { transform: translateY(-2px); }
 
-    /* Colores de los botones */
+    .external-badge {
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      font-size: 0.7rem;
+      opacity: 0.7;
+    }
+
     .btn-rpp { background: linear-gradient(135deg, #0d3b66 0%, #001e3d 100%); }
     .btn-ritmo { background: linear-gradient(135deg, #ec4899 0%, #be185d 100%); }
     .btn-garden { background: linear-gradient(135deg, #10b981 0%, #047857 100%); }
-    .btn-la90 { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); } /* Actualizado a La 90 */
+    .btn-la90 { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
     .btn-america { background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); }
     .btn-famelack { background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%); }
 
-    /* Reproductor / Contenedor Embebido */
     .player-container {
       background: rgba(15, 23, 42, 0.8);
       border: 1px solid rgba(255, 255, 255, 0.1);
@@ -134,15 +138,11 @@
 
     .video-frame-wrapper {
       position: relative;
-      padding-bottom: 56.25%; /* 16:9 */
+      padding-bottom: 56.25%;
       height: 0;
       overflow: hidden;
       border-radius: 12px;
       background: #000;
-    }
-
-    .video-frame-wrapper.large-frame {
-      padding-bottom: 85%; 
     }
 
     .video-frame-wrapper iframe {
@@ -163,6 +163,25 @@
       margin-top: 10px;
     }
 
+    .error-box {
+      display: none;
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      border-radius: 10px;
+      padding: 14px;
+      margin-top: 12px;
+      font-size: 0.8rem;
+      color: #fca5a5;
+    }
+
+    .error-box a {
+      display: inline-block;
+      margin-top: 8px;
+      color: #38bdf8;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
     .btn-stop {
       background: rgba(239, 68, 68, 0.2);
       color: #f87171;
@@ -181,67 +200,57 @@
       background: rgba(239, 68, 68, 0.4);
       color: #fff;
     }
-
-    .fallback-link {
-      display: block;
-      margin-top: 10px;
-      color: #38bdf8;
-      font-size: 0.75rem;
-      text-decoration: underline;
-      text-align: center;
-    }
-    
-    .fallback-link:hover { color: #7dd3fc; }
   </style>
 </head>
 <body>
 
   <div class="box-salvatore">
-    <!-- Botón WhatsApp -->
     <a href="https://wa.me/51963845681" target="_blank" class="whatsapp-btn" title="Contactar por WhatsApp">
       <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 21.602c-2.64 0-5.28-.68-7.56-1.97l-.54-.32-5.6 1.47 1.49-5.46-.35-.57C1.5 11.23 1.5 8.35 3.32 6.15c1.82-2.2 4.79-3.41 7.89-3.41 2.11 0 4.12.54 5.92 1.61 1.8 1.07 3.16 2.59 3.96 4.45.8 1.86.99 3.86.55 5.75-.44 1.89-1.47 3.56-3.03 4.85-1.56 1.3-3.49 1.99-5.6 1.99z"/></svg>
     </a>
 
     <h1 class="box-title">Salvatore</h1>
-    
+
     <div class="button-group">
-      <!-- CUADRÍCULA 2x2 PARA LAS RADIOS -->
       <div class="radio-grid">
-        <!-- 1. RPP (Stream directo de audio) -->
-        <button class="btn btn-square btn-rpp" onclick="playMedia('https://stream.zeno.fm/0r0xa792kwzuv', 'RPP Noticias', true)">
+        <!-- 1. RPP: reproductor oficial embebible de Zeno.fm (no la URL de stream cruda) -->
+        <button class="btn btn-square btn-rpp" onclick="playAudio('https://zeno.fm/player/studio-rpp', 'RPP Noticias', true)">
           <span class="icon">📻</span>
           <span>RPP</span>
         </button>
 
-        <!-- 2. Radio Ritmo Romántica (Stream directo de audio) -->
-        <button class="btn btn-square btn-ritmo" onclick="playMedia('https://stream.crpradios.pe/ritmoromantica.mp3', 'Ritmo Romántica', true)">
+        <!-- 2. Ritmo Romántica: audio directo con fallback si la URL caducó -->
+        <button class="btn btn-square btn-ritmo" onclick="playAudio('https://stream.crpradios.pe/ritmoromantica.mp3', 'Ritmo Romántica', false, 'https://www.ritmoromantica.pe/')">
           <span class="icon">💝</span>
           <span>Ritmo Romántica</span>
         </button>
 
-        <!-- 3. Radio Garden (Web embebida) -->
-        <button class="btn btn-square btn-garden" onclick="playMedia('https://radio.garden/', 'Radio Garden', false, true)">
+        <!-- 3. Radio Garden: bloquea iframes (X-Frame-Options) -> abre en pestaña nueva -->
+        <button class="btn btn-square btn-garden" onclick="openExternal('https://radio.garden/')">
           <span class="icon">🌍</span>
           <span>Radio Garden</span>
+          <span class="external-badge">↗</span>
         </button>
 
-        <!-- 4. La Noventa Entera (Web embebida) -->
-        <button class="btn btn-square btn-la90" onclick="playMedia('https://lanoventera.com/', 'La Noventa Entera', false)">
+        <!-- 4. La Noventa Entera: probablemente bloquea iframes -> abre en pestaña nueva -->
+        <button class="btn btn-square btn-la90" onclick="openExternal('https://lanoventera.com/')">
           <span class="icon">🎵</span>
           <span>La Noventa Entera</span>
+          <span class="external-badge">↗</span>
         </button>
       </div>
 
-      <!-- CUADRÍCULA PARA LOS CANALES DE TELEVISIÓN -->
       <div class="tv-grid">
-        <!-- América TV -->
-        <button class="btn btn-america" onclick="playMedia('https://tvgo.americatv.com.pe/', 'América TV En Vivo', false)">
+        <!-- América TV: bloquea iframes -> abre en pestaña nueva -->
+        <button class="btn btn-america" onclick="openExternal('https://tvgo.americatv.com.pe/')">
           <span>América TV en vivo</span>
+          <span class="external-badge">↗</span>
         </button>
 
-        <!-- Famelack TV -->
-        <button class="btn btn-famelack" onclick="playMedia('https://famelack.com/', 'Famelack Live TV', false)">
+        <!-- Famelack TV: bloquea iframes -> abre en pestaña nueva -->
+        <button class="btn btn-famelack" onclick="openExternal('https://famelack.com/')">
           <span>Famelack TV</span>
+          <span class="external-badge">↗</span>
         </button>
       </div>
     </div>
@@ -249,62 +258,68 @@
     <div id="playerContainer" class="player-container">
       <div id="playerTitle" style="color: #38bdf8; font-size: 0.95rem; font-weight: 600; margin-bottom: 15px;">Cargando...</div>
       <div id="mediaSpace"></div>
+      <div id="errorBox" class="error-box"></div>
       <button class="btn-stop" onclick="stopAll()">⏹ Detener y Cerrar</button>
     </div>
   </div>
 
   <script>
     function stopAll() {
-      const mediaSpace = document.getElementById('mediaSpace');
-      mediaSpace.innerHTML = ''; // Destruye el iframe o audio para detener la reproducción
+      document.getElementById('mediaSpace').innerHTML = '';
+      document.getElementById('errorBox').style.display = 'none';
       document.getElementById('playerContainer').style.display = 'none';
       document.getElementById('playerTitle').textContent = 'Cargando...';
     }
-    
+
+    // Abre sitios que no se pueden embeber por seguridad (X-Frame-Options / CSP)
+    function openExternal(url) {
+      window.open(url, '_blank', 'noopener');
+    }
+
     /**
-     * Función unificada para cargar transmisiones.
-     * @param {string} url - La URL del stream o sitio web.
-     * @param {string} name - Nombre a mostrar.
-     * @param {boolean} isAudio - Si es true, usa la etiqueta <audio> nativa (mucho más fiable para radios).
-     * @param {boolean} isLarge - Si es true, aplica un aspecto más alto (para Radio Garden).
+     * Reproduce audio o el embed oficial de Zeno.
+     * @param {string} url - stream mp3/aac directo, o URL del player de Zeno.
+     * @param {string} name - nombre a mostrar.
+     * @param {boolean} isZenoEmbed - true si es un iframe oficial de zeno.fm/player/...
+     * @param {string} fallbackSiteUrl - sitio oficial a abrir si el stream directo falla.
      */
-    function playMedia(url, name, isAudio, isLarge = false) {
+    function playAudio(url, name, isZenoEmbed, fallbackSiteUrl) {
       stopAll();
       document.getElementById('playerTitle').textContent = `▶ Reproduciendo: ${name}`;
       document.getElementById('playerContainer').style.display = 'block';
-      
+
       const mediaSpace = document.getElementById('mediaSpace');
-      
-      if (isAudio) {
-        // Usar <audio> nativo para streams MP3/HLS. Es 100% fiable y no lo bloquean los navegadores.
+      const errorBox = document.getElementById('errorBox');
+
+      if (isZenoEmbed) {
+        // Zeno.fm SÍ permite ser embebido en iframe (es su feature de "player embebible")
         mediaSpace.innerHTML = `
-          <div class="audio-wrapper">
-            <p style="color: #cbd5e1; font-size: 0.85rem; margin-bottom: 10px;">Stream de audio en vivo</p>
-            <audio controls autoplay name="media">
-              <source src="${url}" type="audio/mpeg">
-              <source src="${url}" type="audio/aac">
-              Tu navegador no soporta la reproducción de audio HTML5.
-            </audio>
-            <p style="color: #94a3b8; font-size: 0.75rem; margin-top: 12px;">💡 Si no inicia automáticamente, haz clic en el botón "Play" del reproductor.</p>
+          <div class="video-frame-wrapper" style="padding-bottom: 45%;">
+            <iframe src="${url}" scrolling="no" allow="autoplay"></iframe>
           </div>
         `;
-      } else {
-        // Usar <iframe> para sitios web completos (Radio Garden, TV, Famelack, La Noventa Entera)
-        const frameClass = isLarge ? "video-frame-wrapper large-frame" : "video-frame-wrapper";
-        mediaSpace.innerHTML = `
-          <div class="${frameClass}">
-            <iframe 
-              src="${url}" 
-              allow="autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" 
-              allowfullscreen 
-              sandbox="allow-same-origin allow-scripts allow-popups allow-forms">
-            </iframe>
-          </div>
-          <a href="${url}" target="_blank" class="fallback-link">
-            ⚠️ Si la pantalla se queda en blanco, haz clic aquí para abrir en una nueva pestaña
-          </a>
-        `;
+        return;
       }
+
+      mediaSpace.innerHTML = `
+        <div class="audio-wrapper">
+          <p style="color: #cbd5e1; font-size: 0.85rem; margin-bottom: 10px;">Stream de audio en vivo</p>
+          <audio id="audioEl" controls autoplay>
+            <source src="${url}" type="audio/mpeg">
+          </audio>
+        </div>
+      `;
+
+      const audioEl = document.getElementById('audioEl');
+      audioEl.addEventListener('error', () => {
+        if (fallbackSiteUrl) {
+          errorBox.style.display = 'block';
+          errorBox.innerHTML = `
+            No se pudo cargar el stream directo (la URL puede haber cambiado).
+            <br><a href="${fallbackSiteUrl}" target="_blank">Abrir ${name} en su web oficial →</a>
+          `;
+        }
+      });
     }
   </script>
 </body>
