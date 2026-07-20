@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FANTOM - Player & WhatsApp</title>
+  <title>FANTOMS - Player & WhatsApp</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
   <style>
@@ -56,6 +56,40 @@
     }
 
     .whatsapp-btn svg { width: 25px; height: 25px; fill: white; }
+
+    .taxi-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 20px;
+      z-index: 15;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: repeating-linear-gradient(135deg, #FFC107 0 14px, #111 14px 16px);
+      color: #0A0D12;
+      text-decoration: none;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 12px 18px 12px 14px;
+      border-radius: 999px;
+      box-shadow: 0 10px 24px -8px rgba(255, 193, 7, 0.55), 0 0 0 2px rgba(0,0,0,0.5);
+      animation: taxiPulse 1.8s ease-in-out infinite;
+    }
+
+    .taxi-btn span.taxi-text {
+      background: #111;
+      color: #FFC107;
+      padding: 3px 10px;
+      border-radius: 999px;
+    }
+
+    .taxi-btn:hover { animation-play-state: paused; transform: scale(1.05); }
+
+    @keyframes taxiPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+    }
 
     .box-title {
       font-size: 2.2rem;
@@ -209,8 +243,12 @@
       <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 21.602c-2.64 0-5.28-.68-7.56-1.97l-.54-.32-5.6 1.47 1.49-5.46-.35-.57C1.5 11.23 1.5 8.35 3.32 6.15c1.82-2.2 4.79-3.41 7.89-3.41 2.11 0 4.12.54 5.92 1.61 1.8 1.07 3.16 2.59 3.96 4.45.8 1.86.99 3.86.55 5.75-.44 1.89-1.47 3.56-3.03 4.85-1.56 1.3-3.49 1.99-5.6 1.99z"/></svg>
     </a>
 
-    <h1 class="box-title">FANTOM</h1>
+    <h1 class="box-title">FANTOMS</h1>
     <p style="color:#94a3b8; font-size:0.8rem; margin-top:-18px; margin-bottom:20px; letter-spacing:0.5px;">Escucha la radio. Descubre la música.</p>
+
+    <a href="https://rutasya.netlify.app/" target="_blank" rel="noopener" class="taxi-btn">
+      🚕 <span class="taxi-text">Pide tu Taxi</span>
+    </a>
 
     <div class="button-group">
       <div class="radio-grid">
@@ -264,7 +302,76 @@
   </div>
 
   <script>
+    // ===== Sistema de cuñas publicitarias (rotación ponderada por lo que paga cada anunciante) =====
+    // Edita este arreglo con tus 20 anunciantes. "peso" = precio en soles que paga cada uno
+    // (S/8, S/10, S/19...) -> entre más paga, más veces suena proporcionalmente.
+    // audioUrl debe ser un link directo a un .mp3 de la cuña (súbelo a Netlify, Supabase Storage, etc.)
+    const AD_SLOTS = [
+      { name: "Anunciante Básico (S/8)",   audioUrl: "https://TU-DOMINIO.netlify.app/cunas/basico.mp3",   peso: 8  },
+      { name: "Anunciante Estándar (S/10)", audioUrl: "https://TU-DOMINIO.netlify.app/cunas/estandar.mp3", peso: 10 },
+      { name: "Anunciante Premium (S/19)", audioUrl: "https://TU-DOMINIO.netlify.app/cunas/premium.mp3", peso: 19 },
+    ];
+
+    const AD_INTERVAL_MINUTES = 15; // cada cuánto interrumpe con una cuña mientras sigue escuchando
+
+    // Arma una "bolsa" con cada anunciante repetido según su peso, y saca uno al azar.
+    // Con pesos 8/10/19, el Premium sale ~2.4x más seguido que el Básico — proporcional a lo que paga.
+    function pickWeightedAd() {
+      if (AD_SLOTS.length === 0) return null;
+      const bag = [];
+      AD_SLOTS.forEach((ad) => { for (let i = 0; i < ad.peso; i++) bag.push(ad); });
+      return bag[Math.floor(Math.random() * bag.length)];
+    }
+
+    let sessionAdPlayed = false;   // cuña de bienvenida: solo 1 vez por sesión (en memoria, no persiste)
+    let adRotationTimer = null;
+    let activeStreamAudio = null;  // referencia al <audio> del stream en vivo que está sonando
+
+    function clearAdRotation() {
+      if (adRotationTimer) { clearInterval(adRotationTimer); adRotationTimer = null; }
+    }
+
+    function scheduleAdRotation() {
+      clearAdRotation();
+      adRotationTimer = setInterval(() => {
+        if (activeStreamAudio && !activeStreamAudio.paused) playInterstitialAd();
+      }, AD_INTERVAL_MINUTES * 60 * 1000);
+    }
+
+    // Interrumpe el stream en vivo, suena una cuña, y retoma el stream donde iba.
+    function playInterstitialAd() {
+      const ad = pickWeightedAd();
+      if (!ad || !activeStreamAudio) return;
+      activeStreamAudio.pause();
+      document.getElementById('playerTitle').textContent = `📢 ${ad.name}`;
+      const adAudio = new Audio(ad.audioUrl);
+      const resume = () => {
+        document.getElementById('playerTitle').textContent = `▶ En vivo`;
+        activeStreamAudio.play().catch(() => {});
+      };
+      adAudio.addEventListener('ended', resume);
+      adAudio.addEventListener('error', resume);
+      adAudio.play().catch(resume);
+    }
+
+    // Cuña de bienvenida: suena 1 sola vez por sesión, antes de la primera radio que se toque.
+    function maybePlayPreRoll(onDone) {
+      if (sessionAdPlayed || AD_SLOTS.length === 0) { onDone(); return; }
+      sessionAdPlayed = true;
+      const ad = pickWeightedAd();
+      if (!ad) { onDone(); return; }
+      document.getElementById('playerTitle').textContent = `📢 Publicidad`;
+      document.getElementById('mediaSpace').innerHTML = `<div class="audio-wrapper"><p style="color:#94a3b8; font-size:0.85rem;">📢 ${ad.name}</p></div>`;
+      const adAudio = new Audio(ad.audioUrl);
+      const proceed = () => onDone();
+      adAudio.addEventListener('ended', proceed);
+      adAudio.addEventListener('error', proceed);
+      adAudio.play().catch(proceed); // si el navegador bloquea el autoplay, pasa directo al stream
+    }
+
     function stopAll() {
+      clearAdRotation();
+      activeStreamAudio = null;
       document.getElementById('mediaSpace').innerHTML = '';
       document.getElementById('errorBox').style.display = 'none';
       document.getElementById('playerContainer').style.display = 'none';
@@ -380,22 +487,26 @@
     function playFromPeruList(index) {
       const station = peruStationList[index];
       if (!station) return;
-      document.getElementById('playerTitle').textContent = `▶ Reproduciendo: ${station.name}`;
-      const mediaSpace = document.getElementById('mediaSpace');
-      const errorBox = document.getElementById('errorBox');
-      mediaSpace.innerHTML = `
-        <div class="audio-wrapper">
-          <p style="color: #cbd5e1; font-size: 0.85rem; margin-bottom: 10px;">${station.name}</p>
-          <audio id="audioEl" controls autoplay>
-            <source src="${station.url_resolved}">
-          </audio>
-          <button onclick="showPeruRadioList()" style="margin-top:12px; background:transparent; border:1px solid rgba(255,255,255,0.15); color:#94a3b8; border-radius:8px; padding:6px 12px; font-size:0.75rem; cursor:pointer;">← Volver a la lista</button>
-        </div>
-      `;
-      const audioEl = document.getElementById('audioEl');
-      audioEl.addEventListener('error', () => {
-        errorBox.style.display = 'block';
-        errorBox.innerHTML = `Esa emisora no respondió ahora mismo. Probá otra de la lista.`;
+      maybePlayPreRoll(() => {
+        document.getElementById('playerTitle').textContent = `▶ Reproduciendo: ${station.name}`;
+        const mediaSpace = document.getElementById('mediaSpace');
+        const errorBox = document.getElementById('errorBox');
+        mediaSpace.innerHTML = `
+          <div class="audio-wrapper">
+            <p style="color: #cbd5e1; font-size: 0.85rem; margin-bottom: 10px;">${station.name}</p>
+            <audio id="audioEl" controls autoplay>
+              <source src="${station.url_resolved}">
+            </audio>
+            <button onclick="showPeruRadioList()" style="margin-top:12px; background:transparent; border:1px solid rgba(255,255,255,0.15); color:#94a3b8; border-radius:8px; padding:6px 12px; font-size:0.75rem; cursor:pointer;">← Volver a la lista</button>
+          </div>
+        `;
+        const audioEl = document.getElementById('audioEl');
+        activeStreamAudio = audioEl;
+        scheduleAdRotation();
+        audioEl.addEventListener('error', () => {
+          errorBox.style.display = 'block';
+          errorBox.innerHTML = `Esa emisora no respondió ahora mismo. Probá otra de la lista.`;
+        });
       });
     }
 
@@ -429,22 +540,26 @@
       }
 
       document.getElementById('playerTitle').textContent = `▶ Reproduciendo: ${station.name}`;
-      mediaSpace.innerHTML = `
-        <div class="audio-wrapper">
-          <p style="color: #cbd5e1; font-size: 0.85rem; margin-bottom: 10px;">Stream de audio en vivo</p>
-          <audio id="audioEl" controls autoplay>
-            <source src="${station.url_resolved}">
-          </audio>
-        </div>
-      `;
-
-      const audioEl = document.getElementById('audioEl');
-      audioEl.addEventListener('error', () => {
-        errorBox.style.display = 'block';
-        errorBox.innerHTML = `
-          Ese stream no respondió (puede estar caído ahora mismo).
-          <br><a href="${fallbackSiteUrl}" target="_blank">Abrir ${displayName} en su web oficial →</a>
+      maybePlayPreRoll(() => {
+        mediaSpace.innerHTML = `
+          <div class="audio-wrapper">
+            <p style="color: #cbd5e1; font-size: 0.85rem; margin-bottom: 10px;">Stream de audio en vivo</p>
+            <audio id="audioEl" controls autoplay>
+              <source src="${station.url_resolved}">
+            </audio>
+          </div>
         `;
+
+        const audioEl = document.getElementById('audioEl');
+        activeStreamAudio = audioEl;
+        scheduleAdRotation();
+        audioEl.addEventListener('error', () => {
+          errorBox.style.display = 'block';
+          errorBox.innerHTML = `
+            Ese stream no respondió (puede estar caído ahora mismo).
+            <br><a href="${fallbackSiteUrl}" target="_blank">Abrir ${displayName} en su web oficial →</a>
+          `;
+        });
       });
     }
 
