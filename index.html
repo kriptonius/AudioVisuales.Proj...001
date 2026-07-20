@@ -363,8 +363,16 @@
       `).join('');
 
       mediaSpace.innerHTML = `
-        <div style="max-height:340px; overflow-y:auto; padding-right:4px;">
-          ${listHtml}
+        <div style="position:relative;">
+          <button onclick="stopAll()" title="Cerrar" style="
+            position:absolute; top:-6px; right:-6px; z-index:2;
+            width:26px; height:26px; border-radius:50%;
+            background:rgba(239,68,68,0.2); border:1px solid rgba(239,68,68,0.4);
+            color:#f87171; font-size:0.85rem; font-weight:700; line-height:1;
+            cursor:pointer; display:flex; align-items:center; justify-content:center;">✕</button>
+          <div style="max-height:340px; overflow-y:auto; padding-right:4px; padding-top:6px;">
+            ${listHtml}
+          </div>
         </div>
       `;
     }
