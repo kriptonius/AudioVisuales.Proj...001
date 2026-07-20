@@ -303,13 +303,15 @@
 
   <script>
     // ===== Sistema de cuñas publicitarias (rotación ponderada por lo que paga cada anunciante) =====
-    // Edita este arreglo con tus 20 anunciantes. "peso" = precio en soles que paga cada uno
-    // (S/8, S/10, S/19...) -> entre más paga, más veces suena proporcionalmente.
-    // audioUrl debe ser un link directo a un .mp3 de la cuña (súbelo a Netlify, Supabase Storage, etc.)
+    // Por defecto está VACÍO (AD_SLOTS = []) para que las radios sigan sonando instantáneo.
+    // Cuando tengas tus mp3 reales subidos, descomenta y llena este arreglo con tus 20 anunciantes.
+    // "peso" = precio en soles que paga cada uno (S/8, S/10, S/19...) -> entre más paga, más suena.
+    // ⚠️ IMPORTANTE: audioUrl debe ser un link REAL que exista (mp3 subido a Netlify/Supabase Storage).
+    // Si dejas un link falso/de ejemplo, esa cuña fallará cada vez y demorará el inicio de la radio.
     const AD_SLOTS = [
-      { name: "Anunciante Básico (S/8)",   audioUrl: "https://TU-DOMINIO.netlify.app/cunas/basico.mp3",   peso: 8  },
-      { name: "Anunciante Estándar (S/10)", audioUrl: "https://TU-DOMINIO.netlify.app/cunas/estandar.mp3", peso: 10 },
-      { name: "Anunciante Premium (S/19)", audioUrl: "https://TU-DOMINIO.netlify.app/cunas/premium.mp3", peso: 19 },
+      // { name: "Anunciante Básico (S/8)",    audioUrl: "https://tu-dominio.netlify.app/cunas/basico.mp3",   peso: 8  },
+      // { name: "Anunciante Estándar (S/10)", audioUrl: "https://tu-dominio.netlify.app/cunas/estandar.mp3", peso: 10 },
+      // { name: "Anunciante Premium (S/19)",  audioUrl: "https://tu-dominio.netlify.app/cunas/premium.mp3",  peso: 19 },
     ];
 
     const AD_INTERVAL_MINUTES = 15; // cada cuánto interrumpe con una cuña mientras sigue escuchando
