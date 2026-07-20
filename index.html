@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salvatore - Player & WhatsApp</title>
+  <title>FANTOM - Player & WhatsApp</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
   <style>
@@ -209,7 +209,8 @@
       <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 21.602c-2.64 0-5.28-.68-7.56-1.97l-.54-.32-5.6 1.47 1.49-5.46-.35-.57C1.5 11.23 1.5 8.35 3.32 6.15c1.82-2.2 4.79-3.41 7.89-3.41 2.11 0 4.12.54 5.92 1.61 1.8 1.07 3.16 2.59 3.96 4.45.8 1.86.99 3.86.55 5.75-.44 1.89-1.47 3.56-3.03 4.85-1.56 1.3-3.49 1.99-5.6 1.99z"/></svg>
     </a>
 
-    <h1 class="box-title">Salvatore</h1>
+    <h1 class="box-title">FANTOM</h1>
+    <p style="color:#94a3b8; font-size:0.8rem; margin-top:-18px; margin-bottom:20px; letter-spacing:0.5px;">Escucha la radio. Descubre la música.</p>
 
     <div class="button-group">
       <div class="radio-grid">
@@ -219,10 +220,10 @@
           <span>RPP</span>
         </button>
 
-        <!-- 2. Ritmo Romántica: se busca el stream real y vivo vía Radio-Browser API -->
-        <button class="btn btn-square btn-ritmo" onclick="playViaRadioBrowser('Ritmo Romantica', 'Ritmo Romántica', 'https://www.ritmoromantica.pe/')">
-          <span class="icon">💝</span>
-          <span>Ritmo Romántica</span>
+        <!-- 2. Perú Radio: lista 50 emisoras peruanas reales para elegir -->
+        <button class="btn btn-square btn-ritmo" onclick="showPeruRadioList()">
+          <span class="icon">🇵🇪</span>
+          <span>Perú Radio</span>
         </button>
 
         <!-- 3. Radio Garden: bloquea iframes (X-Frame-Options) -> abre en pestaña nueva -->
@@ -232,10 +233,10 @@
           <span class="external-badge">↗</span>
         </button>
 
-        <!-- 4. La Noventa Entera: un clic, reproduce embebido vía Radio-Browser -->
-        <button class="btn btn-square btn-la90" onclick="playViaRadioBrowser('Noventera', 'La Noventera', 'https://lanoventera.com/')">
-          <span class="icon">🎵</span>
-          <span>La Noventa Entera</span>
+        <!-- 4. CNN Radio: noticias en inglés, un clic -->
+        <button class="btn btn-square btn-la90" onclick="playViaRadioBrowser('CNN', 'CNN Radio', 'https://edition.cnn.com/audio', null)">
+          <span class="icon">📰</span>
+          <span>CNN Radio</span>
         </button>
       </div>
 
@@ -285,15 +286,15 @@
       "https://nl1.api.radio-browser.info",
     ];
 
-    async function fetchStationFromRadioBrowser(name) {
+    async function fetchStationFromRadioBrowser(name, countrycode = "PE") {
       const params = new URLSearchParams({
         name,
         limit: "10",
         hidebroken: "true",
         order: "clickcount",
         reverse: "true",
-        countrycode: "PE",
       });
+      if (countrycode) params.set("countrycode", countrycode);
       for (const server of RADIO_BROWSER_SERVERS) {
         try {
           const res = await fetch(`${server}/json/stations/search?${params.toString()}`);
@@ -308,13 +309,96 @@
       return null;
     }
 
+    async function fetchTopStations(countrycode, limit) {
+      const params = new URLSearchParams({
+        limit: String(limit),
+        hidebroken: "true",
+        order: "clickcount",
+        reverse: "true",
+        countrycode,
+      });
+      for (const server of RADIO_BROWSER_SERVERS) {
+        try {
+          const res = await fetch(`${server}/json/stations/search?${params.toString()}`);
+          if (!res.ok) continue;
+          const data = await res.json();
+          const valid = (data || []).filter(s => s.url_resolved);
+          if (valid.length > 0) return valid;
+        } catch (e) {
+          // probamos el siguiente servidor espejo
+        }
+      }
+      return [];
+    }
+
     /**
-     * Busca una emisora peruana real y vigente vía Radio-Browser API y la reproduce.
+     * Muestra una lista de 50 emisoras peruanas reales para elegir con un clic.
+     */
+    let peruStationList = [];
+    async function showPeruRadioList() {
+      stopAll();
+      document.getElementById('playerTitle').textContent = `🇵🇪 Perú Radio`;
+      document.getElementById('playerContainer').style.display = 'block';
+
+      const mediaSpace = document.getElementById('mediaSpace');
+      mediaSpace.innerHTML = `<div class="audio-wrapper"><p style="color:#94a3b8; font-size:0.85rem;">Cargando 50 emisoras peruanas…</p></div>`;
+
+      peruStationList = await fetchTopStations("PE", 50);
+
+      if (peruStationList.length === 0) {
+        mediaSpace.innerHTML = `<div class="audio-wrapper"><p style="color:#fca5a5; font-size:0.85rem;">No se pudo cargar la lista de emisoras. Intenta de nuevo.</p></div>`;
+        return;
+      }
+
+      const listHtml = peruStationList.map((s, i) => `
+        <button onclick="playFromPeruList(${i})" style="
+          display:flex; align-items:center; justify-content:space-between;
+          width:100%; text-align:left; background: rgba(255,255,255,0.04);
+          border:1px solid rgba(255,255,255,0.08); border-radius:10px;
+          padding:10px 12px; margin-bottom:6px; color:#EDEFF3; font-size:0.85rem;
+          cursor:pointer;">
+          <span>${s.name}</span>
+          <span style="color:#38bdf8; font-size:0.75rem;">▶</span>
+        </button>
+      `).join('');
+
+      mediaSpace.innerHTML = `
+        <div style="max-height:340px; overflow-y:auto; padding-right:4px;">
+          ${listHtml}
+        </div>
+      `;
+    }
+
+    function playFromPeruList(index) {
+      const station = peruStationList[index];
+      if (!station) return;
+      document.getElementById('playerTitle').textContent = `▶ Reproduciendo: ${station.name}`;
+      const mediaSpace = document.getElementById('mediaSpace');
+      const errorBox = document.getElementById('errorBox');
+      mediaSpace.innerHTML = `
+        <div class="audio-wrapper">
+          <p style="color: #cbd5e1; font-size: 0.85rem; margin-bottom: 10px;">${station.name}</p>
+          <audio id="audioEl" controls autoplay>
+            <source src="${station.url_resolved}">
+          </audio>
+          <button onclick="showPeruRadioList()" style="margin-top:12px; background:transparent; border:1px solid rgba(255,255,255,0.15); color:#94a3b8; border-radius:8px; padding:6px 12px; font-size:0.75rem; cursor:pointer;">← Volver a la lista</button>
+        </div>
+      `;
+      const audioEl = document.getElementById('audioEl');
+      audioEl.addEventListener('error', () => {
+        errorBox.style.display = 'block';
+        errorBox.innerHTML = `Esa emisora no respondió ahora mismo. Probá otra de la lista.`;
+      });
+    }
+
+    /**
+     * Busca una emisora real y vigente vía Radio-Browser API y la reproduce.
      * @param {string} searchName - nombre para buscar en Radio-Browser (ej. "RPP").
      * @param {string} displayName - nombre a mostrar en pantalla.
      * @param {string} fallbackSiteUrl - web oficial a abrir si no se encuentra ningún stream.
+     * @param {string|null} countrycode - código de país ISO para filtrar (ej. "PE"), o null para buscar sin restricción de país.
      */
-    async function playViaRadioBrowser(searchName, displayName, fallbackSiteUrl) {
+    async function playViaRadioBrowser(searchName, displayName, fallbackSiteUrl, countrycode = "PE") {
       stopAll();
       document.getElementById('playerTitle').textContent = `🔎 Buscando: ${displayName}...`;
       document.getElementById('playerContainer').style.display = 'block';
@@ -323,7 +407,7 @@
       const errorBox = document.getElementById('errorBox');
       mediaSpace.innerHTML = `<div class="audio-wrapper"><p style="color:#94a3b8; font-size:0.85rem;">Consultando emisoras en vivo…</p></div>`;
 
-      const station = await fetchStationFromRadioBrowser(searchName);
+      const station = await fetchStationFromRadioBrowser(searchName, countrycode);
 
       if (!station) {
         document.getElementById('playerTitle').textContent = `⚠ ${displayName}`;
