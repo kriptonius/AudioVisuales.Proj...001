@@ -565,32 +565,23 @@
       return `${AUDIO_PROXY_ENDPOINT}?url=${encodeURIComponent(rawUrl)}`;
     }
 
+    // URL directa y real del stream de FANTOMS (confirmada por Salvatore).
+    // No depende de que Radio-Browser la indexe.
+    const FANTOMS_STREAM_URL = "http://134.122.116.92:8000/fantoms.mp3";
+
     async function playFantomsRadio() {
       stopAll();
-      document.getElementById('playerTitle').textContent = `🔎 Buscando: FANTOMS...`;
+      document.getElementById('playerTitle').textContent = `🔥 Reproduciendo: FANTOMS`;
       document.getElementById('playerContainer').style.display = 'block';
       const mediaSpace = document.getElementById('mediaSpace');
       const errorBox = document.getElementById('errorBox');
-      mediaSpace.innerHTML = `<div class="audio-wrapper"><p style="color:#94a3b8; font-size:0.85rem;">Consultando FANTOMS en vivo…</p></div>`;
 
-      // Búsqueda sin restricción de país, porque puede no estar aún geoetiquetada como PE
-      const station = await fetchStationFromRadioBrowser('FANTOMS', null);
-
-      if (!station) {
-        document.getElementById('playerTitle').textContent = `⚠ FANTOMS`;
-        errorBox.style.display = 'block';
-        errorBox.innerHTML = `Todavía no encontramos FANTOMS indexada en el directorio de radios. Si ya la enviaste a Radio Garden, puede tardar en aparecer.`;
-        mediaSpace.innerHTML = '';
-        return;
-      }
-
-      const rawUrl = station.url_resolved;
+      const rawUrl = FANTOMS_STREAM_URL;
       const isHttp = rawUrl.startsWith('http://');
 
-      document.getElementById('playerTitle').textContent = `🔥 Reproduciendo: ${station.name}`;
       mediaSpace.innerHTML = `
         <div class="audio-wrapper">
-          <p style="color: #cbd5e1; font-size: 0.85rem; margin-bottom: 10px;">${station.name}</p>
+          <p style="color: #cbd5e1; font-size: 0.85rem; margin-bottom: 10px;">FANTOMS</p>
           <audio id="audioEl" controls autoplay>
             <source id="audioSrc" src="${rawUrl}">
           </audio>
@@ -600,9 +591,9 @@
 
       const audioEl = document.getElementById('audioEl');
       activeStreamAudio = audioEl;
-      currentStationName = station.name;
+      currentStationName = 'FANTOMS';
       scheduleAdRotation();
-      showMiniPlayer(station.name);
+      showMiniPlayer('FANTOMS');
 
       let triedProxy = false;
       audioEl.addEventListener('error', () => {
@@ -619,7 +610,7 @@
         }
         errorBox.style.display = 'block';
         errorBox.innerHTML = triedProxy
-          ? `Ni el stream directo ni el proxy respondieron. Verifica que <code>netlify/edge-functions/radio-proxy.js</code> esté desplegado, o confirma con tu proveedor si tienen una URL en https://.`
+          ? `Ni el stream directo ni el proxy respondieron. Verifica que <code>netlify/edge-functions/radio-proxy.js</code> esté desplegado, o que el servidor de FANTOMS (134.122.116.92:8000) esté encendido en este momento.`
           : `FANTOMS no respondió ahora mismo. Probá de nuevo en un momento.`;
       });
     }
@@ -905,7 +896,14 @@
 
     // ===== Instalar como app (PWA) =====
     // Chrome/Android muestra el evento beforeinstallprompt cuando el sitio cumple los
-    // requisitos mínimos (manifest + servido por HTTPS). Netlify ya sirve por HTTPS.
+    // requisitos: manifest + HTTPS (Netlify ya lo hace) + un Service Worker registrado.
+    // Sin el service worker, este evento NUNCA se dispara y el botón queda escondido siempre.
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {
+        // Si /sw.js no existe todavía en el servidor, simplemente no habrá botón de instalar.
+      });
+    }
+
     let deferredInstallPrompt = null;
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
