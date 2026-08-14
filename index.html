@@ -578,14 +578,18 @@
 
       const rawUrl = FANTOMS_STREAM_URL;
       const isHttp = rawUrl.startsWith('http://');
+      // Confirmado: dentro del <audio> embebido, el navegador bloquea/reintenta por HTTPS
+      // el link HTTP directo y eso demora antes de fallar. Si ya sabemos que es HTTP,
+      // vamos directo al proxy en vez de perder tiempo con el intento fallido.
+      const initialUrl = isHttp ? toProxyUrl(rawUrl) : rawUrl;
 
       mediaSpace.innerHTML = `
         <div class="audio-wrapper">
           <p style="color: #cbd5e1; font-size: 0.85rem; margin-bottom: 10px;">FANTOMS</p>
           <audio id="audioEl" controls autoplay>
-            <source id="audioSrc" src="${rawUrl}">
+            <source id="audioSrc" src="${initialUrl}">
           </audio>
-          <p id="proxyNote" style="color:#94a3b8; font-size:0.7rem; margin-top:8px; display:none;"></p>
+          <p id="proxyNote" style="color:#94a3b8; font-size:0.7rem; margin-top:8px; ${isHttp ? '' : 'display:none;'}">${isHttp ? 'Cargando vía proxy HTTPS (el stream original es HTTP)…' : ''}</p>
         </div>
       `;
 
@@ -595,21 +599,18 @@
       scheduleAdRotation();
       showMiniPlayer('FANTOMS');
 
-      let triedProxy = false;
+      let triedDirect = false;
       audioEl.addEventListener('error', () => {
-        if (isHttp && !triedProxy) {
-          // El intento directo falló (probable bloqueo por contenido mixto) -> reintenta vía proxy
-          triedProxy = true;
-          document.getElementById('audioSrc').src = toProxyUrl(rawUrl);
+        if (isHttp && !triedDirect) {
+          // El proxy falló -> como último intento, probamos el link directo por si acaso
+          triedDirect = true;
+          document.getElementById('audioSrc').src = rawUrl;
           audioEl.load();
           audioEl.play().catch(() => {});
-          const note = document.getElementById('proxyNote');
-          note.style.display = 'block';
-          note.textContent = 'Reproduciendo vía proxy HTTPS (el stream original es HTTP)';
           return;
         }
         errorBox.style.display = 'block';
-        errorBox.innerHTML = triedProxy
+        errorBox.innerHTML = triedDirect
           ? `Ni el stream directo ni el proxy respondieron. Verifica que <code>netlify/edge-functions/radio-proxy.js</code> esté desplegado, o que el servidor de FANTOMS (134.122.116.92:8000) esté encendido en este momento.`
           : `FANTOMS no respondió ahora mismo. Probá de nuevo en un momento.`;
       });
