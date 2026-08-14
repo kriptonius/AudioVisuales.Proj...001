@@ -29,7 +29,13 @@ export default async (request) => {
 
   try {
     const upstream = await fetch(streamUrl, {
-      headers: { "User-Agent": "Mozilla/5.0 (compatible; RadioProxy/1.0)" },
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; RadioProxy/1.0)",
+        // Sin esto, muchos servidores Icecast/Shoutcast intercalan metadata (título de
+        // la canción) dentro del audio, lo que puede confundir al proxy y demorar el
+        // primer byte de sonido. Pedimos el stream "limpio", sin metadata.
+        "Icy-MetaData": "0",
+      },
     });
 
     if (!upstream.ok || !upstream.body) {
