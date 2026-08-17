@@ -294,6 +294,18 @@
 
     .fantoms-viral-left { display: flex; flex-direction: column; align-items: flex-start; text-align: left; }
     .fantoms-viral-title { font-weight: 700; font-size: 1rem; display: flex; align-items: center; gap: 6px; }
+
+    .fantoms-btn-progress-fill {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 0%;
+      background: rgba(34, 197, 94, 0.45);
+      border-radius: 16px 0 0 16px;
+      transition: width 0.25s ease-out;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .fantoms-viral-left, .fantoms-share-icon { position: relative; z-index: 1; }
     .fantoms-viral-sub { font-size: 0.72rem; opacity: 0.9; margin-top: 2px; }
     .fantoms-share-icon {
       flex: 0 0 auto;
@@ -447,9 +459,10 @@
 
       <!-- Botón viral: tu propia radio FANTOMS, con acción de compartir integrada -->
       <button class="fantoms-viral-btn" onclick="playFantomsRadio()">
+        <div id="fantomsBtnProgressFill" class="fantoms-btn-progress-fill"></div>
         <span class="fantoms-viral-left">
           <span class="fantoms-viral-title">🔥 Radio FANTOMS</span>
-          <span class="fantoms-viral-sub">Tócala y escúchala ahora</span>
+          <span id="fantomsBtnSub" class="fantoms-viral-sub">Tócala y escúchala ahora</span>
         </span>
         <span class="fantoms-share-icon" onclick="event.stopPropagation(); shareFantoms();" title="Compartir">📤</span>
       </button>
@@ -602,6 +615,10 @@
       document.getElementById('playerContainer').style.display = 'none';
       document.getElementById('playerTitle').textContent = 'Cargando...';
       hideMiniPlayer();
+      const btnFill = document.getElementById('fantomsBtnProgressFill');
+      const btnSub = document.getElementById('fantomsBtnSub');
+      if (btnFill) btnFill.style.width = '0%';
+      if (btnSub) btnSub.textContent = 'Tócala y escúchala ahora';
     }
 
     // Abre sitios que no se pueden embeber por seguridad (X-Frame-Options / CSP)
@@ -661,9 +678,13 @@
 
       // Barra de progreso falsa: sube sola hasta 92% (nunca miente llegando a 100%
       // sin sonar de verdad), y al primer sonido real salta a 100% y se oculta.
+      // Se refleja en dos lugares: la barra dentro del reproductor y el relleno del botón de arriba.
       let fakePercent = 0;
       const progressFill = document.getElementById('fantomsProgressFill');
       const progressLabel = document.getElementById('fantomsProgressLabel');
+      const btnFill = document.getElementById('fantomsBtnProgressFill');
+      const btnSub = document.getElementById('fantomsBtnSub');
+      const originalBtnSub = btnSub ? btnSub.textContent : '';
       const progressTimer = setInterval(() => {
         if (fakePercent >= 92) return;
         // sube rápido al inicio y se frena cerca del tope, para verse "real"
@@ -671,14 +692,21 @@
         if (fakePercent > 92) fakePercent = 92;
         if (progressFill) progressFill.style.width = fakePercent + '%';
         if (progressLabel) progressLabel.textContent = `Conectando… ${fakePercent}%`;
+        if (btnFill) btnFill.style.width = fakePercent + '%';
+        if (btnSub) btnSub.textContent = `Cargando… ${fakePercent}%`;
       }, 250);
 
       function finishProgress() {
         clearInterval(progressTimer);
         if (progressFill) progressFill.style.width = '100%';
         if (progressLabel) progressLabel.textContent = '¡Sonando! 100%';
+        if (btnFill) btnFill.style.width = '100%';
+        if (btnSub) btnSub.textContent = '🎧 Sonando ahora';
         const wrap = document.querySelector('.fantoms-progress-wrap');
         setTimeout(() => { if (wrap) wrap.style.display = 'none'; }, 900);
+        setTimeout(() => {
+          if (btnFill) btnFill.style.width = '0%';
+        }, 1500);
       }
       audioEl.addEventListener('playing', finishProgress, { once: true });
 
