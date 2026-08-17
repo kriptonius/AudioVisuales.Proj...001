@@ -112,6 +112,19 @@
       line-height: 1.25;
     }
 
+    .sticky-header {
+      position: sticky;
+      top: 0;
+      z-index: 25;
+      background: rgba(30, 41, 59, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 35px 25px 16px;
+      margin: -35px -25px 16px;
+      border-radius: 24px 24px 0 0;
+      box-shadow: 0 12px 16px -10px rgba(0, 0, 0, 0.55);
+    }
+
     .neon-salvatore {
       display: inline-block;
       color: #00eaff;
@@ -380,19 +393,58 @@
       background: rgba(239, 68, 68, 0.4);
       color: #fff;
     }
+
+    .fantoms-progress-wrap {
+      margin-top: 12px;
+    }
+    .fantoms-progress-track {
+      width: 100%;
+      height: 10px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .fantoms-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #16a34a, #22c55e);
+      border-radius: 999px;
+      transition: width 0.25s ease-out;
+      box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+    }
+    .fantoms-progress-label {
+      font-size: 0.72rem;
+      color: #86efac;
+      margin-top: 6px;
+      font-weight: 600;
+    }
   </style>
+
+  <!-- ===== Google Analytics (GA4) =====
+       Reemplaza G-XXXXXXXXXX por tu ID real de Medición.
+       Cómo sacarlo: analytics.google.com → Admin → Crear propiedad → escribe
+       "Audio Player Salvatore" → Flujo de datos "Web" → pega la URL de tu sitio
+       (https://radtv.netlify.app) → Google te da el ID que empieza con "G-".
+  -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+  </script>
 </head>
 <body>
 
   <div class="box-salvatore">
-    <a href="https://wa.me/51963845681" target="_blank" class="whatsapp-btn" title="Contactar por WhatsApp">
-      <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 21.602c-2.64 0-5.28-.68-7.56-1.97l-.54-.32-5.6 1.47 1.49-5.46-.35-.57C1.5 11.23 1.5 8.35 3.32 6.15c1.82-2.2 4.79-3.41 7.89-3.41 2.11 0 4.12.54 5.92 1.61 1.8 1.07 3.16 2.59 3.96 4.45.8 1.86.99 3.86.55 5.75-.44 1.89-1.47 3.56-3.03 4.85-1.56 1.3-3.49 1.99-5.6 1.99z"/></svg>
-    </a>
+    <div class="sticky-header">
+      <a href="https://wa.me/51963845681" target="_blank" class="whatsapp-btn" title="Contactar por WhatsApp">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 21.602c-2.64 0-5.28-.68-7.56-1.97l-.54-.32-5.6 1.47 1.49-5.46-.35-.57C1.5 11.23 1.5 8.35 3.32 6.15c1.82-2.2 4.79-3.41 7.89-3.41 2.11 0 4.12.54 5.92 1.61 1.8 1.07 3.16 2.59 3.96 4.45.8 1.86.99 3.86.55 5.75-.44 1.89-1.47 3.56-3.03 4.85-1.56 1.3-3.49 1.99-5.6 1.99z"/></svg>
+      </a>
 
-    <h1 class="box-title">Audio Player <span class="neon-salvatore">SALVATORE</span></h1>
-    <p style="color:#94a3b8; font-size:0.8rem; margin-top:-18px; margin-bottom:20px; letter-spacing:0.5px;">Escucha la radio. Descubre la música.</p>
+      <h1 class="box-title">Audio Player <span class="neon-salvatore">SALVATORE</span></h1>
+      <p style="color:#94a3b8; font-size:0.8rem; margin-top:-18px; margin-bottom:20px; letter-spacing:0.5px;">Escucha la radio. Descubre la música.</p>
 
-    <div class="button-group">
       <!-- Botón viral: tu propia radio FANTOMS, con acción de compartir integrada -->
       <button class="fantoms-viral-btn" onclick="playFantomsRadio()">
         <span class="fantoms-viral-left">
@@ -401,7 +453,9 @@
         </span>
         <span class="fantoms-share-icon" onclick="event.stopPropagation(); shareFantoms();" title="Compartir">📤</span>
       </button>
+    </div>
 
+    <div class="button-group">
       <button id="installBtn" class="install-btn" onclick="installApp()">📲 Agregar a mi pantalla de inicio</button>
 
       <div class="radio-grid">
@@ -454,7 +508,7 @@
     </div>
   </div>
 
-  <a href="https://rutasya.netlify.app/" target="_blank" rel="noopener" class="taxi-btn">
+  <a href="https://rutasya.netlify.app/" target="_blank" rel="noopener" class="taxi-btn" onclick="if(typeof gtag==='function')gtag('event','click_taxi');">
     🚕 <span class="taxi-text">Pide tu Taxi</span>
   </a>
 
@@ -589,6 +643,12 @@
           <audio id="audioEl" controls autoplay>
             <source id="audioSrc" src="${initialUrl}">
           </audio>
+          <div class="fantoms-progress-wrap">
+            <div class="fantoms-progress-track">
+              <div id="fantomsProgressFill" class="fantoms-progress-fill"></div>
+            </div>
+            <div id="fantomsProgressLabel" class="fantoms-progress-label">Conectando… 0%</div>
+          </div>
           <p id="proxyNote" style="color:#94a3b8; font-size:0.7rem; margin-top:8px; ${isHttp ? '' : 'display:none;'}">${isHttp ? 'Cargando vía proxy HTTPS (el stream original es HTTP)…' : ''}</p>
         </div>
       `;
@@ -598,6 +658,29 @@
       currentStationName = 'FANTOMS';
       scheduleAdRotation();
       showMiniPlayer('FANTOMS');
+
+      // Barra de progreso falsa: sube sola hasta 92% (nunca miente llegando a 100%
+      // sin sonar de verdad), y al primer sonido real salta a 100% y se oculta.
+      let fakePercent = 0;
+      const progressFill = document.getElementById('fantomsProgressFill');
+      const progressLabel = document.getElementById('fantomsProgressLabel');
+      const progressTimer = setInterval(() => {
+        if (fakePercent >= 92) return;
+        // sube rápido al inicio y se frena cerca del tope, para verse "real"
+        fakePercent += fakePercent < 60 ? 4 : 1;
+        if (fakePercent > 92) fakePercent = 92;
+        if (progressFill) progressFill.style.width = fakePercent + '%';
+        if (progressLabel) progressLabel.textContent = `Conectando… ${fakePercent}%`;
+      }, 250);
+
+      function finishProgress() {
+        clearInterval(progressTimer);
+        if (progressFill) progressFill.style.width = '100%';
+        if (progressLabel) progressLabel.textContent = '¡Sonando! 100%';
+        const wrap = document.querySelector('.fantoms-progress-wrap');
+        setTimeout(() => { if (wrap) wrap.style.display = 'none'; }, 900);
+      }
+      audioEl.addEventListener('playing', finishProgress, { once: true });
 
       let triedDirect = false;
       audioEl.addEventListener('error', () => {
@@ -609,6 +692,7 @@
           audioEl.play().catch(() => {});
           return;
         }
+        clearInterval(progressTimer);
         errorBox.style.display = 'block';
         errorBox.innerHTML = triedDirect
           ? `Ni el stream directo ni el proxy respondieron. Verifica que <code>netlify/edge-functions/radio-proxy.js</code> esté desplegado, o que el servidor de FANTOMS (134.122.116.92:8000) esté encendido en este momento.`
@@ -618,6 +702,7 @@
 
     // Comparte tu radio por WhatsApp / lo que soporte el celular (Web Share API con fallback)
     function shareFantoms() {
+      if (typeof gtag === 'function') gtag('event', 'share_fantoms');
       const shareData = {
         title: "Radio FANTOMS",
         text: "🔥 Estoy escuchando Radio FANTOMS en vivo, escúchala tú también 🎧",
@@ -867,6 +952,10 @@
       document.getElementById('miniPlayerName').textContent = name;
       document.getElementById('miniPlayBtn').textContent = '⏸';
       checkMiniPlayerVisibility();
+      // Registra en Google Analytics qué emisora se reprodujo (para saber cuál es más popular)
+      if (typeof gtag === 'function') {
+        gtag('event', 'play_radio', { station_name: name });
+      }
     }
 
     function hideMiniPlayer() {
@@ -918,6 +1007,16 @@
       deferredInstallPrompt.userChoice.finally(() => {
         deferredInstallPrompt = null;
         document.getElementById('installBtn').classList.remove('is-visible');
+      });
+    }
+
+    // ===== Auto-arranque al abrir desde el ícono instalado (Mi Bulla) =====
+    // El manifest.json tiene start_url: "/?launch=fantoms" — cuando el sistema abre
+    // la app instalada, siempre carga esa URL con ese parámetro. Si detectamos que
+    // venimos de ahí (y no de una visita normal por Chrome), arrancamos FANTOMS solo.
+    if (new URLSearchParams(window.location.search).get('launch') === 'fantoms') {
+      window.addEventListener('DOMContentLoaded', () => {
+        playFantomsRadio();
       });
     }
   </script>

@@ -2,7 +2,7 @@
   "name": "Mi Bulla",
   "short_name": "Mi Bulla",
   "description": "Escucha radios peruanas, TV en vivo y noticias internacionales — todo en un solo lugar.",
-  "start_url": "/",
+  "start_url": "/?launch=fantoms",
   "scope": "/",
   "display": "standalone",
   "background_color": "#0f172a",
