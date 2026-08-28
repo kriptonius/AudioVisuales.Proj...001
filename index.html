@@ -181,7 +181,14 @@
 
     .button-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
 
-    .radio-grid, .tv-grid {
+    .radio-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .tv-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
@@ -210,21 +217,22 @@
       aspect-ratio: 1 / 1;
       flex-direction: column;
       justify-content: center;
-      gap: 4px;
-      font-size: 0.65rem;
+      gap: 3px;
+      font-size: 0.58rem;
+      line-height: 1.15;
       text-align: center;
       position: relative;
-      padding: 8px 10px;
+      padding: 6px 4px;
     }
 
-    .btn-square span.icon { font-size: 1.1rem; }
+    .btn-square span.icon { font-size: 1.3rem; }
     .btn:hover { transform: translateY(-2px); }
 
     .external-badge {
       position: absolute;
-      top: 6px;
-      right: 8px;
-      font-size: 0.7rem;
+      top: 4px;
+      right: 5px;
+      font-size: 0.55rem;
       opacity: 0.7;
     }
 
