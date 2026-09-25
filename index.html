@@ -65,7 +65,7 @@
 
     .whatsapp-btn svg { width: 25px; height: 25px; fill: white; }
 
-    .taxi-btn {
+    .portfolio-btn {
       position: fixed;
       bottom: 24px;
       right: 20px;
@@ -73,26 +73,73 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      background: repeating-linear-gradient(135deg, #FFC107 0 14px, #111 14px 16px);
-      color: #0A0D12;
-      text-decoration: none;
+      background: linear-gradient(135deg, #818cf8, #6366f1);
+      color: #fff;
+      border: none;
+      cursor: pointer;
       font-family: 'Poppins', sans-serif;
       font-weight: 700;
       font-size: 0.85rem;
       padding: 12px 18px 12px 14px;
       border-radius: 999px;
-      box-shadow: 0 10px 24px -8px rgba(255, 193, 7, 0.55), 0 0 0 2px rgba(0,0,0,0.5);
+      box-shadow: 0 10px 24px -8px rgba(99, 102, 241, 0.55), 0 0 0 2px rgba(0,0,0,0.35);
       animation: taxiPulse 1.8s ease-in-out infinite;
     }
 
-    .taxi-btn span.taxi-text {
-      background: #111;
-      color: #FFC107;
-      padding: 3px 10px;
-      border-radius: 999px;
+    .portfolio-btn .plus-icon {
+      font-size: 1.1rem;
+      font-weight: 700;
+      background: rgba(0,0,0,0.25);
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      line-height: 1;
     }
 
-    .taxi-btn:hover { animation-play-state: paused; transform: scale(1.05); }
+    .portfolio-btn:hover { animation-play-state: paused; transform: scale(1.05); }
+
+    .portfolio-menu {
+      position: fixed;
+      bottom: 82px;
+      right: 20px;
+      z-index: 16;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      background: rgba(15, 23, 42, 0.97);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      padding: 12px;
+      min-width: 220px;
+      max-width: 80vw;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 20px 40px -14px rgba(0,0,0,0.7);
+    }
+    .portfolio-menu.is-open { display: flex; }
+    .portfolio-menu-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      color: #94a3b8;
+      text-transform: uppercase;
+      padding: 2px 4px 4px;
+    }
+    .portfolio-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: #EDEFF3;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .portfolio-item:active { background: rgba(255,255,255,0.1); }
+    .portfolio-item .emoji { font-size: 1.1rem; }
 
     @keyframes taxiPulse {
       0%, 100% { transform: scale(1); }
@@ -533,9 +580,14 @@
     </div>
   </div>
 
-  <a href="https://rutasya.netlify.app/" target="_blank" rel="noopener" class="taxi-btn" onclick="if(typeof gtag==='function')gtag('event','click_taxi');">
-    🚕 <span class="taxi-text">Pide tu Taxi</span>
-  </a>
+  <button class="portfolio-btn" onclick="togglePortfolioMenu()">
+    <span class="plus-icon">+</span> Portafolio
+  </button>
+
+  <div id="portfolioMenu" class="portfolio-menu">
+    <span class="portfolio-menu-title">Más de Estrada</span>
+    <div id="portfolioItems"></div>
+  </div>
 
   <div id="miniPlayerBar" class="mini-player-bar">
     <div class="mini-player-info">
@@ -555,6 +607,44 @@
     // "peso" = precio en soles que paga cada uno (S/8, S/10, S/19...) -> entre más paga, más suena.
     // ⚠️ IMPORTANTE: audioUrl debe ser un link REAL que exista (mp3 subido a Netlify/Supabase Storage).
     // Si dejas un link falso/de ejemplo, esa cuña fallará cada vez y demorará el inicio de la radio.
+    // ===== Portafolio: tus otros productos, listados en el botón "+" =====
+    // Edita este arreglo para agregar/quitar apps tuyas. url puede ser un link
+    // externo (target _blank) o un wa.me directo.
+    const PORTFOLIO_ITEMS = [
+      { name: "RutaYa — Pide tu Taxi", emoji: "🚕", url: "https://rutasya.netlify.app/" },
+      // { name: "KIRU — Pasta Dental", emoji: "🦷", url: "https://TU-LINK-KIRU" },
+      // { name: "Pollux GX — Motos", emoji: "🏍️", url: "https://TU-LINK-POLLUX" },
+      // { name: "Dental VRAEM", emoji: "🩺", url: "https://wa.me/51963845681" },
+    ];
+
+    function renderPortfolioItems() {
+      const container = document.getElementById('portfolioItems');
+      container.innerHTML = PORTFOLIO_ITEMS.map((item, i) => `
+        <a href="${item.url}" target="_blank" rel="noopener" class="portfolio-item"
+           onclick="if(typeof gtag==='function')gtag('event','click_portfolio_item', {item_name:'${item.name.replace(/'/g, "\\'")}'});">
+          <span class="emoji">${item.emoji}</span>
+          <span>${item.name}</span>
+        </a>
+      `).join('');
+    }
+
+    function togglePortfolioMenu() {
+      const menu = document.getElementById('portfolioMenu');
+      const opening = !menu.classList.contains('is-open');
+      if (opening) renderPortfolioItems();
+      menu.classList.toggle('is-open', opening);
+      if (opening && typeof gtag === 'function') gtag('event', 'open_portfolio_menu');
+    }
+
+    // Cierra el menú si tocan afuera
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('portfolioMenu');
+      const btn = document.querySelector('.portfolio-btn');
+      if (menu.classList.contains('is-open') && !menu.contains(e.target) && !btn.contains(e.target)) {
+        menu.classList.remove('is-open');
+      }
+    });
+
     const AD_SLOTS = [
       // { name: "Anunciante Básico (S/8)",    audioUrl: "https://tu-dominio.netlify.app/cunas/basico.mp3",   peso: 8  },
       // { name: "Anunciante Estándar (S/10)", audioUrl: "https://tu-dominio.netlify.app/cunas/estandar.mp3", peso: 10 },
@@ -650,7 +740,7 @@
 
     // URL directa y real del stream de FANTOMS (confirmada por Salvatore).
     // No depende de que Radio-Browser la indexe.
-    const FANTOMS_STREAM_URL = "http://134.122.116.92:8000/fantoms.mp3";
+    const FANTOMS_STREAM_URL = "http://157.245.247.5:8000/stream";
 
     async function playFantomsRadio() {
       stopAll();
