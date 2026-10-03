@@ -615,8 +615,6 @@
     gtag('js', new Date());
     gtag('config', 'G-XXXXXXXXXX');
   </script>
-  <!-- PayPal — botón hospedado para "Invítame un café" -->
-  <script src="https://www.paypal.com/sdk/js?client-id=BAA8VpBMazt2M9sr7hES6WIy78AVDgQ-HC3M0rgXLWVh0wvqA8XftjPqvSdg2SFLgrRjhYEgpFQSekQKjU&components=hosted-buttons&disable-funding=venmo&currency=USD"></script>
 </head>
 <body>
 
@@ -731,12 +729,9 @@
         <button class="coffee-amount-btn" data-amount="10" onclick="selectCoffeeAmount(this,10)">S/10</button>
       </div>
 
-      <p style="font-size:0.65rem; color:#5B6472; text-transform:uppercase; letter-spacing:0.08em; margin:0 0 4px;">Opción 1 · Yape / Plin (QR Izipay)</p>
+      <p style="font-size:0.65rem; color:#5B6472; text-transform:uppercase; letter-spacing:0.08em; margin:0 0 4px;">Escanea con Yape o Plin</p>
       <img src="/Screenshot_20261003_013843.jpg" alt="QR Izipay IZI*ODONTUS 5069916" style="width:100%; max-width:220px; border-radius:10px; border:1px solid #232A34; margin-bottom:8px;">
       <button class="coffee-confirm-btn" onclick="confirmCoffeeWhatsapp()">✅ Ya pagué, avisar por WhatsApp</button>
-
-      <p style="font-size:0.65rem; color:#5B6472; text-transform:uppercase; letter-spacing:0.08em; margin:16px 0 8px;">Opción 2 · Tarjeta / PayPal</p>
-      <div id="paypal-container-KFFG94K9P6KAG"></div>
     </div>
   </div>
 
@@ -797,18 +792,14 @@
     });
 
     // ===== "Invítame un café" — donación voluntaria, nunca bloquea nada =====
+    // Nota: se quitó el botón de PayPal porque esa cuenta devolvía error al pagar
+    // ("PayPal no está disponible en este momento"). Mientras esa cuenta no esté
+    // verificada/operativa, Yape/Plin vía QR Izipay es el único método — ya funciona bien.
     let coffeeSelectedAmount = 5;
-    let coffeePaypalRendered = false;
 
     function openCoffeeModal() {
       document.getElementById('coffeeModalOverlay').classList.add('is-open');
       if (typeof gtag === 'function') gtag('event', 'open_coffee_modal');
-      if (!coffeePaypalRendered && window.paypal && paypal.HostedButtons) {
-        try {
-          paypal.HostedButtons({ hostedButtonId: "KFFG94K9P6KAG" }).render("#paypal-container-KFFG94K9P6KAG");
-          coffeePaypalRendered = true;
-        } catch (e) { /* si el SDK aún no cargó, el contenedor simplemente queda vacío */ }
-      }
     }
 
     function closeCoffeeModal() {
