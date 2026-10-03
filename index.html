@@ -427,6 +427,117 @@
     }
     .install-btn.is-visible { display: flex; }
 
+    .support-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .support-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      padding: 12px 8px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #fff;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .support-btn .icon { font-size: 1.3rem; }
+    .btn-coffee { background: linear-gradient(135deg, #92400e, #b45309); }
+    .btn-shoutout { background: linear-gradient(135deg, #0e7490, #0891b2); }
+
+    .ad-banner-slot {
+      border: 1px dashed rgba(255,255,255,0.18);
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      text-align: center;
+      background: rgba(255,255,255,0.03);
+      cursor: pointer;
+      text-decoration: none;
+      display: block;
+    }
+    .ad-banner-label {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      color: #5B6472;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 3px;
+    }
+    .ad-banner-text {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      margin: 0;
+    }
+
+    .coffee-modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      background: rgba(5,7,10,0.72);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .coffee-modal-overlay.is-open { display: flex; }
+    .coffee-modal {
+      position: relative;
+      width: 100%;
+      max-width: 320px;
+      background: linear-gradient(160deg, #11151C, #0D1015);
+      border: 1px solid #232A34;
+      border-radius: 18px;
+      padding: 22px 20px;
+      text-align: center;
+    }
+    .coffee-modal-close {
+      position: absolute; top: 12px; right: 12px;
+      background: transparent; border: none; color: #5B6472; cursor: pointer; font-size: 1.1rem;
+    }
+    .coffee-amounts { display: flex; gap: 8px; justify-content: center; margin: 14px 0; }
+    .coffee-amount-btn {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #fff;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+    }
+    .coffee-amount-btn.selected { background: #b45309; border-color: #b45309; }
+    .coffee-yape-number {
+      background: #0A0D12;
+      border: 1px solid #232A34;
+      border-radius: 10px;
+      padding: 10px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 1rem;
+      color: #EDEFF3;
+      margin-bottom: 12px;
+    }
+    .coffee-confirm-btn {
+      width: 100%;
+      background: #25D366;
+      color: #0A0D12;
+      border: none;
+      border-radius: 10px;
+      padding: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+    }
+
     .error-box {
       display: none;
       background: rgba(239, 68, 68, 0.12);
@@ -504,6 +615,8 @@
     gtag('js', new Date());
     gtag('config', 'G-XXXXXXXXXX');
   </script>
+  <!-- PayPal — botón hospedado para "Invítame un café" -->
+  <script src="https://www.paypal.com/sdk/js?client-id=BAA8VpBMazt2M9sr7hES6WIy78AVDgQ-HC3M0rgXLWVh0wvqA8XftjPqvSdg2SFLgrRjhYEgpFQSekQKjU&components=hosted-buttons&disable-funding=venmo&currency=USD"></script>
 </head>
 <body>
 
@@ -570,6 +683,22 @@
           <span class="external-badge">↗</span>
         </button>
       </div>
+
+      <div class="support-row">
+        <button class="support-btn btn-coffee" onclick="openCoffeeModal()">
+          <span class="icon">☕</span>
+          <span>Invítame un café</span>
+        </button>
+        <a class="support-btn btn-shoutout" href="https://wa.me/51963845681?text=Hola!%20Quiero%20pedir%20un%20saludo%20en%20Radio%20FANTOMS%20%F0%9F%8E%A4" target="_blank" rel="noopener" onclick="if(typeof gtag==='function')gtag('event','click_shoutout');">
+          <span class="icon">🎤</span>
+          <span>Pide un saludo</span>
+        </a>
+      </div>
+
+      <a class="ad-banner-slot" href="https://wa.me/51963845681?text=Hola!%20Quiero%20anunciar%20mi%20negocio%20en%20Radio%20FANTOMS" target="_blank" rel="noopener" onclick="if(typeof gtag==='function')gtag('event','click_ad_banner_slot');">
+        <span class="ad-banner-label">Espacio publicitario</span>
+        <p class="ad-banner-text">Tu negocio aquí · contáctanos</p>
+      </a>
     </div>
 
     <div id="playerContainer" class="player-container">
@@ -587,6 +716,28 @@
   <div id="portfolioMenu" class="portfolio-menu">
     <span class="portfolio-menu-title">Más de Estrada</span>
     <div id="portfolioItems"></div>
+  </div>
+
+  <div id="coffeeModalOverlay" class="coffee-modal-overlay" onclick="if(event.target===this)closeCoffeeModal()">
+    <div class="coffee-modal">
+      <button class="coffee-modal-close" onclick="closeCoffeeModal()">✕</button>
+      <div style="font-size:2rem;">☕</div>
+      <div style="font-family:'Poppins',sans-serif; font-weight:700; color:#fff; margin:6px 0 2px;">Invítame un café</div>
+      <p style="font-size:0.78rem; color:#94a3b8; margin:0 0 4px;">Así ayudas a que Radio FANTOMS siga sonando gratis para todos.</p>
+
+      <div class="coffee-amounts">
+        <button class="coffee-amount-btn" data-amount="3" onclick="selectCoffeeAmount(this,3)">S/3</button>
+        <button class="coffee-amount-btn selected" data-amount="5" onclick="selectCoffeeAmount(this,5)">S/5</button>
+        <button class="coffee-amount-btn" data-amount="10" onclick="selectCoffeeAmount(this,10)">S/10</button>
+      </div>
+
+      <p style="font-size:0.65rem; color:#5B6472; text-transform:uppercase; letter-spacing:0.08em; margin:0 0 4px;">Opción 1 · Yape / Plin (QR Izipay)</p>
+      <img src="/izipay-qr-crop.jpg" alt="QR Izipay IZI*ODONTUS 5069916" style="width:100%; max-width:220px; border-radius:10px; border:1px solid #232A34; margin-bottom:8px;">
+      <button class="coffee-confirm-btn" onclick="confirmCoffeeWhatsapp()">✅ Ya pagué, avisar por WhatsApp</button>
+
+      <p style="font-size:0.65rem; color:#5B6472; text-transform:uppercase; letter-spacing:0.08em; margin:16px 0 8px;">Opción 2 · Tarjeta / PayPal</p>
+      <div id="paypal-container-KFFG94K9P6KAG"></div>
+    </div>
   </div>
 
   <div id="miniPlayerBar" class="mini-player-bar">
@@ -644,6 +795,38 @@
         menu.classList.remove('is-open');
       }
     });
+
+    // ===== "Invítame un café" — donación voluntaria, nunca bloquea nada =====
+    let coffeeSelectedAmount = 5;
+    let coffeePaypalRendered = false;
+
+    function openCoffeeModal() {
+      document.getElementById('coffeeModalOverlay').classList.add('is-open');
+      if (typeof gtag === 'function') gtag('event', 'open_coffee_modal');
+      if (!coffeePaypalRendered && window.paypal && paypal.HostedButtons) {
+        try {
+          paypal.HostedButtons({ hostedButtonId: "KFFG94K9P6KAG" }).render("#paypal-container-KFFG94K9P6KAG");
+          coffeePaypalRendered = true;
+        } catch (e) { /* si el SDK aún no cargó, el contenedor simplemente queda vacío */ }
+      }
+    }
+
+    function closeCoffeeModal() {
+      document.getElementById('coffeeModalOverlay').classList.remove('is-open');
+    }
+
+    function selectCoffeeAmount(btn, amount) {
+      coffeeSelectedAmount = amount;
+      document.querySelectorAll('.coffee-amount-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    }
+
+    function confirmCoffeeWhatsapp() {
+      if (typeof gtag === 'function') gtag('event', 'confirm_coffee_donation', { amount: coffeeSelectedAmount });
+      const msg = encodeURIComponent('Hola! Te acabo de pagar S/' + coffeeSelectedAmount + ' con el QR (Yape/Plin) para invitarte un café ☕🔥 (Radio FANTOMS)');
+      window.open('https://wa.me/51963845681?text=' + msg, '_blank');
+      closeCoffeeModal();
+    }
 
     const AD_SLOTS = [
       // { name: "Anunciante Básico (S/8)",    audioUrl: "https://tu-dominio.netlify.app/cunas/basico.mp3",   peso: 8  },
@@ -812,21 +995,69 @@
       }
       audioEl.addEventListener('playing', finishProgress, { once: true });
 
+      // ===== Watchdog: reconecta solo si el stream se queda pegado o se corta =====
+      // Confirmado en uso real: el proxy aguanta horas seguidas sin problema, pero
+      // por si acaso hay un hipo de red o Netlify reinicia la función, esto detecta
+      // que el audio dejó de avanzar (o tiró error) y reconecta sin que el oyente
+      // tenga que tocar nada.
+      const FANTOMS_STALL_MS = 15000;        // sin avanzar 15s mientras "suena" = se colgó
+      const FANTOMS_WATCHDOG_CHECK_MS = 5000;
+      const FANTOMS_RECONNECT_DELAYS = [2000, 4000, 8000, 15000, 30000, 60000];
+      let fantomsLastTimeUpdate = Date.now();
+      let fantomsReconnectAttempts = 0;
+      let fantomsReconnecting = false;
       let triedDirect = false;
+
+      audioEl.addEventListener('timeupdate', () => {
+        fantomsLastTimeUpdate = Date.now();
+        fantomsReconnectAttempts = 0; // volvió a sonar bien -> resetea el contador
+      });
+
+      function reconnectFantoms(reason) {
+        if (activeStreamAudio !== audioEl) return; // ya no es la radio activa (usuario cambió de emisora)
+        if (fantomsReconnecting) return;
+        if (fantomsReconnectAttempts >= FANTOMS_RECONNECT_DELAYS.length) {
+          clearInterval(progressTimer);
+          clearInterval(watchdogTimer);
+          errorBox.style.display = 'block';
+          errorBox.innerHTML = `FANTOMS se desconectó y no se pudo reconectar tras varios intentos. Verifica que el servidor (157.245.247.5:8000) esté encendido, y vuelve a tocar el botón.`;
+          if (typeof gtag === 'function') gtag('event', 'fantoms_reconnect_failed');
+          return;
+        }
+        fantomsReconnecting = true;
+        const delay = FANTOMS_RECONNECT_DELAYS[fantomsReconnectAttempts];
+        fantomsReconnectAttempts++;
+        document.getElementById('playerTitle').textContent = `🔄 Reconectando FANTOMS… (intento ${fantomsReconnectAttempts})`;
+        if (typeof gtag === 'function') gtag('event', 'fantoms_reconnect_attempt', { attempt: fantomsReconnectAttempts, reason });
+        setTimeout(() => {
+          if (activeStreamAudio !== audioEl) { fantomsReconnecting = false; return; }
+          const freshUrl = (isHttp ? toProxyUrl(rawUrl) : rawUrl) + (rawUrl.includes('?') ? '&' : '?') + '_t=' + Date.now();
+          document.getElementById('audioSrc').src = freshUrl;
+          audioEl.load();
+          audioEl.play().then(() => {
+            document.getElementById('playerTitle').textContent = `🔥 Reproduciendo: FANTOMS`;
+          }).catch(() => {});
+          fantomsReconnecting = false;
+        }, delay);
+      }
+
+      const watchdogTimer = setInterval(() => {
+        if (activeStreamAudio !== audioEl) { clearInterval(watchdogTimer); return; }
+        if (!audioEl.paused && Date.now() - fantomsLastTimeUpdate > FANTOMS_STALL_MS) {
+          reconnectFantoms('stall');
+        }
+      }, FANTOMS_WATCHDOG_CHECK_MS);
+
       audioEl.addEventListener('error', () => {
         if (isHttp && !triedDirect) {
-          // El proxy falló -> como último intento, probamos el link directo por si acaso
+          // El proxy falló en el primer intento -> probamos el link directo por si acaso
           triedDirect = true;
           document.getElementById('audioSrc').src = rawUrl;
           audioEl.load();
           audioEl.play().catch(() => {});
           return;
         }
-        clearInterval(progressTimer);
-        errorBox.style.display = 'block';
-        errorBox.innerHTML = triedDirect
-          ? `Ni el stream directo ni el proxy respondieron. Verifica que <code>netlify/edge-functions/radio-proxy.js</code> esté desplegado, o que el servidor de FANTOMS (134.122.116.92:8000) esté encendido en este momento.`
-          : `FANTOMS no respondió ahora mismo. Probá de nuevo en un momento.`;
+        reconnectFantoms('error');
       });
     }
 
