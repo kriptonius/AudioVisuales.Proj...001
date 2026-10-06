@@ -12,7 +12,7 @@
   <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
   <link rel="apple-touch-icon" href="/icon-192.png">
   <link rel="manifest" href="/manifest.json">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Pacifico&display=swap" rel="stylesheet">
 
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
@@ -353,6 +353,15 @@
 
     .fantoms-viral-left { display: flex; flex-direction: column; align-items: flex-start; text-align: left; }
     .fantoms-viral-title { font-weight: 700; font-size: 1rem; display: flex; align-items: center; gap: 6px; }
+    .fantoms-digital-word {
+      font-family: 'Pacifico', cursive;
+      font-style: italic;
+      font-weight: 400;
+      font-size: 1.1rem;
+      color: #00eaff;
+      margin-left: 2px;
+      text-shadow: 0 0 8px rgba(0, 234, 255, 0.6);
+    }
 
     .fantoms-btn-progress-fill {
       position: absolute;
@@ -631,7 +640,7 @@
       <button class="fantoms-viral-btn" onclick="playFantomsRadio()">
         <div id="fantomsBtnProgressFill" class="fantoms-btn-progress-fill"></div>
         <span class="fantoms-viral-left">
-          <span class="fantoms-viral-title">🔥 Radio FANTOMS</span>
+          <span class="fantoms-viral-title">🔥 FANTOMS <span class="fantoms-digital-word">Digital</span></span>
           <span id="fantomsBtnSub" class="fantoms-viral-sub">Tócala y escúchala ahora</span>
         </span>
         <span class="fantoms-share-icon" onclick="event.stopPropagation(); shareFantoms();" title="Compartir">📤</span>
