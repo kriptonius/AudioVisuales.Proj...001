@@ -65,6 +65,28 @@
 
     .whatsapp-btn svg { width: 25px; height: 25px; fill: white; }
 
+    .app-qr-btn {
+      position: absolute;
+      top: 20px;
+      right: 75px;
+      width: 45px;
+      height: 45px;
+      background: linear-gradient(135deg, #0ea5e9, #6366f1);
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(99, 102, 241, 0.35);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      z-index: 10;
+      font-size: 1.15rem;
+      line-height: 1;
+    }
+    .app-qr-btn:hover { transform: scale(1.15) rotate(-6deg); box-shadow: 0 6px 15px rgba(99, 102, 241, 0.5); }
+
     .portfolio-btn {
       position: fixed;
       bottom: 24px;
@@ -458,7 +480,7 @@
       text-decoration: none;
     }
     .support-btn .icon { font-size: 1.3rem; }
-    .btn-coffee { background: linear-gradient(135deg, #92400e, #b45309); }
+    .btn-raffle { background: linear-gradient(135deg, #7c3aed, #c026d3); }
     .btn-shoutout { background: linear-gradient(135deg, #0e7490, #0891b2); }
 
     .ad-banner-slot {
@@ -513,28 +535,36 @@
       position: absolute; top: 12px; right: 12px;
       background: transparent; border: none; color: #5B6472; cursor: pointer; font-size: 1.1rem;
     }
+    .raffle-prize-banner {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, rgba(124,58,237,0.18), rgba(192,38,211,0.14));
+      border: 1px solid rgba(192,38,211,0.35);
+      border-radius: 12px;
+      padding: 8px;
+      margin: 10px 0 14px;
+      text-align: left;
+    }
+    .raffle-prize-banner img {
+      width: 64px; height: 64px; object-fit: cover; border-radius: 8px; flex-shrink: 0;
+    }
+    .raffle-prize-banner-text { font-size: 0.68rem; color: #e9d5ff; line-height: 1.3; }
+    .raffle-prize-banner-text strong { display: block; color: #fff; font-size: 0.78rem; margin-bottom: 1px; }
     .coffee-amounts { display: flex; gap: 8px; justify-content: center; margin: 14px 0; }
     .coffee-amount-btn {
       background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.15);
       color: #fff;
       border-radius: 10px;
-      padding: 10px 14px;
+      padding: 10px 10px;
       font-weight: 700;
+      font-size: 0.75rem;
       cursor: pointer;
       font-family: 'Poppins', sans-serif;
+      flex: 1;
     }
-    .coffee-amount-btn.selected { background: #b45309; border-color: #b45309; }
-    .coffee-yape-number {
-      background: #0A0D12;
-      border: 1px solid #232A34;
-      border-radius: 10px;
-      padding: 10px;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 1rem;
-      color: #EDEFF3;
-      margin-bottom: 12px;
-    }
+    .coffee-amount-btn.selected { background: #c026d3; border-color: #c026d3; }
     .coffee-confirm-btn {
       width: 100%;
       background: #25D366;
@@ -633,6 +663,10 @@
         <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 21.602c-2.64 0-5.28-.68-7.56-1.97l-.54-.32-5.6 1.47 1.49-5.46-.35-.57C1.5 11.23 1.5 8.35 3.32 6.15c1.82-2.2 4.79-3.41 7.89-3.41 2.11 0 4.12.54 5.92 1.61 1.8 1.07 3.16 2.59 3.96 4.45.8 1.86.99 3.86.55 5.75-.44 1.89-1.47 3.56-3.03 4.85-1.56 1.3-3.49 1.99-5.6 1.99z"/></svg>
       </a>
 
+      <button class="app-qr-btn" onclick="openAppQrModal()" title="Código QR para compartir la app">
+        <span>▦</span>
+      </button>
+
       <h1 class="box-title">Audio Player <span class="neon-salvatore">SALVATORE</span></h1>
       <p style="color:#94a3b8; font-size:0.8rem; margin-top:-18px; margin-bottom:20px; letter-spacing:0.5px;">Escucha la radio. Descubre la música.</p>
 
@@ -692,9 +726,9 @@
       </div>
 
       <div class="support-row">
-        <button class="support-btn btn-coffee" onclick="openCoffeeModal()">
-          <span class="icon">☕</span>
-          <span>Invítame un café</span>
+        <button class="support-btn btn-raffle" onclick="openCoffeeModal()">
+          <span class="icon">🎟️</span>
+          <span>Sorteo VRAEM</span>
         </button>
         <a class="support-btn btn-shoutout" href="https://wa.me/51963845681?text=Hola!%20Quiero%20pedir%20un%20saludo%20en%20Radio%20FANTOMS%20%F0%9F%8E%A4" target="_blank" rel="noopener" onclick="if(typeof gtag==='function')gtag('event','click_shoutout');">
           <span class="icon">🎤</span>
@@ -728,19 +762,39 @@
   <div id="coffeeModalOverlay" class="coffee-modal-overlay" onclick="if(event.target===this)closeCoffeeModal()">
     <div class="coffee-modal">
       <button class="coffee-modal-close" onclick="closeCoffeeModal()">✕</button>
-      <div style="font-size:2rem;">☕</div>
-      <div style="font-family:'Poppins',sans-serif; font-weight:700; color:#fff; margin:6px 0 2px;">Invítame un café</div>
-      <p style="font-size:0.78rem; color:#94a3b8; margin:0 0 4px;">Así ayudas a que Radio FANTOMS siga sonando gratis para todos.</p>
+      <div style="font-size:2rem;">🎟️</div>
+      <div style="font-family:'Poppins',sans-serif; font-weight:700; color:#fff; margin:6px 0 2px;">Sorteo VRAEM</div>
+      <p style="font-size:0.78rem; color:#94a3b8; margin:0 0 4px;">Cada ticket cuesta S/2. Participa y ayuda a que Radio FANTOMS siga sonando gratis.</p>
 
-      <div class="coffee-amounts">
-        <button class="coffee-amount-btn" data-amount="3" onclick="selectCoffeeAmount(this,3)">S/3</button>
-        <button class="coffee-amount-btn selected" data-amount="5" onclick="selectCoffeeAmount(this,5)">S/5</button>
-        <button class="coffee-amount-btn" data-amount="10" onclick="selectCoffeeAmount(this,10)">S/10</button>
+      <div class="raffle-prize-banner">
+        <img src="/moto-pollux-gt.jpg" alt="Moto Pollux GT, premio del sorteo">
+        <div class="raffle-prize-banner-text">
+          <strong>🏍️ Premio: Moto Pollux GT</strong>
+          Sede VRAEM · sorteo entre todos los tickets vendidos
+        </div>
       </div>
 
-      <p style="font-size:0.65rem; color:#5B6472; text-transform:uppercase; letter-spacing:0.08em; margin:0 0 4px;">Escanea con Yape o Plin</p>
+      <div class="coffee-amounts">
+        <button class="coffee-amount-btn" data-tickets="1" onclick="selectRaffleTickets(this,1)">1 ticket<br>S/2</button>
+        <button class="coffee-amount-btn selected" data-tickets="5" onclick="selectRaffleTickets(this,5)">5 tickets<br>S/10</button>
+        <button class="coffee-amount-btn" data-tickets="10" onclick="selectRaffleTickets(this,10)">10 tickets<br>S/20</button>
+      </div>
+
+      <p style="font-size:0.65rem; color:#5B6472; text-transform:uppercase; letter-spacing:0.08em; margin:0 0 4px;">Paga con Yape o Plin</p>
       <img src="/Screenshot_20261003_013843.jpg" alt="QR Izipay IZI*ODONTUS 5069916" style="width:100%; max-width:220px; border-radius:10px; border:1px solid #232A34; margin-bottom:8px;">
-      <button class="coffee-confirm-btn" onclick="confirmCoffeeWhatsapp()">✅ Ya pagué, avisar por WhatsApp</button>
+      <button class="coffee-confirm-btn" onclick="confirmCoffeeWhatsapp()">✅ Ya pagué, enviar mis datos por WhatsApp</button>
+    </div>
+  </div>
+
+  <div id="appQrModalOverlay" class="coffee-modal-overlay" onclick="if(event.target===this)closeAppQrModal()">
+    <div class="coffee-modal">
+      <button class="coffee-modal-close" onclick="closeAppQrModal()">✕</button>
+      <div style="font-size:2rem;">▦</div>
+      <div style="font-family:'Poppins',sans-serif; font-weight:700; color:#fff; margin:6px 0 2px;">Comparte el Audio Player</div>
+      <p style="font-size:0.78rem; color:#94a3b8; margin:0 0 10px;">Que escaneen este QR para abrir el reproductor al toque, sin escribir nada.</p>
+      <img src="/app-qr.png" alt="QR para abrir Audio Player Salvatore" style="width:100%; max-width:200px; border-radius:10px; border:1px solid #232A34; background:#fff; padding:8px; margin-bottom:10px;">
+      <p style="font-size:0.72rem; color:#38bdf8; word-break:break-all; margin-bottom:12px;">radtv.netlify.app</p>
+      <button class="coffee-confirm-btn" onclick="shareAppLink()">📤 Compartir enlace</button>
     </div>
   </div>
 
@@ -800,32 +854,53 @@
       }
     });
 
-    // ===== "Invítame un café" — donación voluntaria, nunca bloquea nada =====
+    // ===== "Sorteo VRAEM" — rifa de la moto Pollux GT, S/2 por ticket =====
     // Nota: se quitó el botón de PayPal porque esa cuenta devolvía error al pagar
     // ("PayPal no está disponible en este momento"). Mientras esa cuenta no esté
     // verificada/operativa, Yape/Plin vía QR Izipay es el único método — ya funciona bien.
-    let coffeeSelectedAmount = 5;
+    let raffleTickets = 5;
 
     function openCoffeeModal() {
       document.getElementById('coffeeModalOverlay').classList.add('is-open');
-      if (typeof gtag === 'function') gtag('event', 'open_coffee_modal');
+      if (typeof gtag === 'function') gtag('event', 'open_raffle_modal');
     }
 
     function closeCoffeeModal() {
       document.getElementById('coffeeModalOverlay').classList.remove('is-open');
     }
 
-    function selectCoffeeAmount(btn, amount) {
-      coffeeSelectedAmount = amount;
+    function selectRaffleTickets(btn, tickets) {
+      raffleTickets = tickets;
       document.querySelectorAll('.coffee-amount-btn').forEach(b => b.classList.remove('selected'));
       btn.classList.add('selected');
     }
 
     function confirmCoffeeWhatsapp() {
-      if (typeof gtag === 'function') gtag('event', 'confirm_coffee_donation', { amount: coffeeSelectedAmount });
-      const msg = encodeURIComponent('Hola! Te acabo de pagar S/' + coffeeSelectedAmount + ' con el QR (Yape/Plin) para invitarte un café ☕🔥 (Radio FANTOMS)');
+      const amount = raffleTickets * 2;
+      if (typeof gtag === 'function') gtag('event', 'confirm_raffle_tickets', { tickets: raffleTickets, amount });
+      const msg = encodeURIComponent('Hola! Te acabo de pagar S/' + amount + ' con el QR (Yape/Plin) por ' + raffleTickets + ' ticket(s) del Sorteo VRAEM 🎟️🏍️ (moto Pollux GT). Mi nombre es: ');
       window.open('https://wa.me/51963845681?text=' + msg, '_blank');
       closeCoffeeModal();
+    }
+
+    // ===== QR para compartir la app (propagación viral) =====
+    function openAppQrModal() {
+      document.getElementById('appQrModalOverlay').classList.add('is-open');
+      if (typeof gtag === 'function') gtag('event', 'open_app_qr_modal');
+    }
+
+    function closeAppQrModal() {
+      document.getElementById('appQrModalOverlay').classList.remove('is-open');
+    }
+
+    function shareAppLink() {
+      const url = 'https://radtv.netlify.app/';
+      if (typeof gtag === 'function') gtag('event', 'share_app_link');
+      if (navigator.share) {
+        navigator.share({ title: 'Audio Player SALVATORE', text: '🔥 Escucha radios, TV y Radio FANTOMS en vivo — todo en un solo lugar 🎧', url }).catch(() => {});
+      } else {
+        window.open('https://wa.me/?text=' + encodeURIComponent('🔥 Escucha radios, TV y Radio FANTOMS en vivo — todo en un solo lugar 🎧 ' + url), '_blank');
+      }
     }
 
     const AD_SLOTS = [
