@@ -486,13 +486,11 @@
     .ad-banner-slot {
       border: 1px dashed rgba(255,255,255,0.18);
       border-radius: 14px;
-      padding: 12px 14px;
+      padding: 10px 14px 12px;
       margin-bottom: 14px;
       text-align: center;
       background: rgba(255,255,255,0.03);
-      cursor: pointer;
-      text-decoration: none;
-      display: block;
+      overflow: hidden;
     }
     .ad-banner-label {
       font-family: 'Poppins', sans-serif;
@@ -501,12 +499,47 @@
       color: #5B6472;
       text-transform: uppercase;
       display: block;
-      margin-bottom: 3px;
+      margin-bottom: 8px;
     }
     .ad-banner-text {
       font-size: 0.75rem;
       color: #94a3b8;
       margin: 0;
+    }
+    .ad-banner-marquee-viewport {
+      overflow: hidden;
+      width: 100%;
+    }
+    .ad-banner-marquee-track {
+      display: flex;
+      align-items: center;
+      width: max-content;
+      animation: adMarqueeScroll 18s linear infinite;
+    }
+    .ad-banner-marquee-track:hover { animation-play-state: paused; }
+    @keyframes adMarqueeScroll {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+    .ad-banner-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      padding: 0 18px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .ad-banner-item img {
+      width: 44px; height: 44px; object-fit: cover; border-radius: 10px;
+    }
+    .ad-banner-item span {
+      font-size: 0.6rem;
+      color: #94a3b8;
+      white-space: nowrap;
+      max-width: 90px;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .coffee-modal-overlay {
@@ -768,10 +801,12 @@
         </a>
       </div>
 
-      <a class="ad-banner-slot" href="https://wa.me/51963845681?text=Hola!%20Quiero%20anunciar%20mi%20negocio%20en%20Radio%20FANTOMS" target="_blank" rel="noopener" onclick="if(typeof gtag==='function')gtag('event','click_ad_banner_slot');">
+      <div class="ad-banner-slot">
         <span class="ad-banner-label">Espacio publicitario</span>
-        <p class="ad-banner-text">Tu negocio aquí · contáctanos</p>
-      </a>
+        <div class="ad-banner-marquee-viewport">
+          <div id="adBannerMarquee" class="ad-banner-marquee-track"></div>
+        </div>
+      </div>
     </div>
 
     <div id="playerContainer" class="player-container">
@@ -799,10 +834,11 @@
       <p style="font-size:0.78rem; color:#94a3b8; margin:0 0 4px;">Cada ticket cuesta S/2. Participa y ayuda a que Radio FANTOMS siga sonando gratis.</p>
 
       <div class="raffle-prize-banner">
-        <img src="/moto-pollux-gt.jpg" alt="Moto Pollux GT, premio del sorteo">
+        <img src="/moto-pollux-gt.jpg" alt="Moto Pollux GT, premio del sorteo" onclick="openImageLightbox('/moto-pollux-gt.jpg')">
         <div class="raffle-prize-banner-text">
           <strong>🏍️ Premio: Moto Pollux GT</strong>
           Sede VRAEM · sorteo entre todos los tickets vendidos
+          <span class="zoom-hint">👆 Toca la foto para verla más grande</span>
         </div>
       </div>
 
@@ -828,6 +864,11 @@
       <p style="font-size:0.72rem; color:#38bdf8; word-break:break-all; margin-bottom:12px;">radtv.netlify.app</p>
       <button class="coffee-confirm-btn" onclick="shareAppLink()">📤 Compartir enlace</button>
     </div>
+  </div>
+
+  <div id="imageLightboxOverlay" class="image-lightbox-overlay" onclick="if(event.target===this)closeImageLightbox()">
+    <button class="image-lightbox-close" onclick="closeImageLightbox()">✕</button>
+    <img id="imageLightboxImg" src="" alt="">
   </div>
 
   <div id="miniPlayerBar" class="mini-player-bar">
@@ -934,6 +975,39 @@
         window.open('https://wa.me/?text=' + encodeURIComponent('🔥 Escucha radios, TV y Radio FANTOMS en vivo — todo en un solo lugar 🎧 ' + url), '_blank');
       }
     }
+
+    // ===== Lightbox genérico — ampliar cualquier imagen (premio del sorteo, etc.) =====
+    function openImageLightbox(src) {
+      const img = document.getElementById('imageLightboxImg');
+      img.src = src;
+      document.getElementById('imageLightboxOverlay').classList.add('is-open');
+      if (typeof gtag === 'function') gtag('event', 'open_image_lightbox', { src });
+    }
+    function closeImageLightbox() {
+      document.getElementById('imageLightboxOverlay').classList.remove('is-open');
+    }
+
+    // ===== Banda de anunciantes (espacio publicitario) =====
+    // Agrega un cliente nuevo simplemente sumando otro objeto a este arreglo.
+    // La banda se mueve sola en bucle; mientras más clientes, más larga la vuelta.
+    const AD_BANNER_CLIENTS = [
+      { name: "Dental Sol Naciente", logo: "/logo-sol-naciente.png", url: "https://dentivrae.floot.app" },
+    ];
+
+    function renderAdBannerMarquee() {
+      const track = document.getElementById('adBannerMarquee');
+      if (!track || AD_BANNER_CLIENTS.length === 0) return;
+      // Se duplica la lista para que el bucle de desplazamiento sea continuo (sin salto visible).
+      const items = AD_BANNER_CLIENTS.concat(AD_BANNER_CLIENTS).map((c) => `
+        <a class="ad-banner-item" href="${c.url}" target="_blank" rel="noopener"
+           onclick="if(typeof gtag==='function')gtag('event','click_ad_banner_logo', {client:'${c.name.replace(/'/g, "\\'")}'});">
+          <img src="${c.logo}" alt="${c.name}">
+          <span>${c.name}</span>
+        </a>
+      `).join('');
+      track.innerHTML = items;
+    }
+    renderAdBannerMarquee();
 
     const AD_SLOTS = [
       // { name: "Anunciante Básico (S/8)",    audioUrl: "https://tu-dominio.netlify.app/cunas/basico.mp3",   peso: 8  },
