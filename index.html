@@ -454,19 +454,28 @@
       gap: 10px;
       background: rgba(15, 23, 42, 0.97);
       border-top: 1px solid rgba(255,255,255,0.1);
-      padding: 10px 16px;
+      padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
     }
 
     .mini-player-bar.is-visible { display: flex; }
     .mini-player-info { display: flex; align-items: center; gap: 8px; min-width: 0; color: #EDEFF3; font-size: 0.82rem; }
-    .mini-player-info span.dot { width: 7px; height: 7px; border-radius: 50%; background: #5DDD8F; flex: 0 0 auto; }
-    .mini-player-info span.name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mini-player-info { gap: 12px; }
+    .mini-player-info span.dot { width: 14px; height: 14px; border-radius: 50%; background: #F59E0B; flex: 0 0 auto; box-shadow: 0 0 0 0 rgba(245,158,11,0.6); animation: miniPulse 1.4s infinite; }
+    .mini-player-info span.dot.is-playing { background: #5DDD8F; box-shadow: 0 0 0 0 rgba(93,221,143,0.6); }
+    .mini-player-info span.dot.is-paused { background: #94a3b8; animation: none; }
+    @keyframes miniPulse { 70% { box-shadow: 0 0 0 8px rgba(0,0,0,0); } 100% { box-shadow: 0 0 0 0 rgba(0,0,0,0); } }
+    .mini-player-text { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
+    .mini-player-text .name { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mini-player-text .status { font-size: 0.65rem; color: #94a3b8; }
+    body.has-mini { padding-bottom: 76px; }
+    body.has-mini .portfolio-btn { bottom: 88px; }
+    body.has-mini .portfolio-menu { bottom: 146px; }
     .mini-player-actions { display: flex; gap: 8px; flex: 0 0 auto; }
     .mini-player-actions button {
       background: rgba(255,255,255,0.08); border: none; color: #EDEFF3;
-      width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 0.85rem;
+      width: 42px; height: 42px; border-radius: 50%; cursor: pointer; font-size: 1.05rem;
     }
 
     .install-btn {
@@ -998,12 +1007,15 @@
 
   <div id="miniPlayerBar" class="mini-player-bar">
     <div class="mini-player-info">
-      <span class="dot"></span>
-      <span id="miniPlayerName" class="name">Reproduciendo…</span>
+      <span id="miniDot" class="dot"></span>
+      <div class="mini-player-text">
+        <span id="miniPlayerName" class="name">Reproduciendo…</span>
+        <span id="miniStatus" class="status">Conectando…</span>
+      </div>
     </div>
     <div class="mini-player-actions">
       <button onclick="toggleMiniPlay()" id="miniPlayBtn" title="Pausar/Reanudar">⏸</button>
-      <button onclick="stopAll()" title="Cerrar">✕</button>
+      <button onclick="stopAll()" title="Detener">■</button>
     </div>
   </div>
 
@@ -1688,6 +1700,7 @@
       currentStationName = name;
       document.getElementById('miniPlayerName').textContent = name;
       document.getElementById('miniPlayBtn').textContent = '⏸';
+      setMiniState('connecting');
       checkMiniPlayerVisibility();
       // Registra en Google Analytics qué emisora se reprodujo (para saber cuál es más popular)
       if (typeof gtag === 'function') {
@@ -1697,6 +1710,7 @@
 
     function hideMiniPlayer() {
       document.getElementById('miniPlayerBar').classList.remove('is-visible');
+      document.body.classList.remove('has-mini');
     }
 
     function toggleMiniPlay() {
@@ -1711,24 +1725,22 @@
     // ===== Tarjeta blanca de reproducción (nombre + botón play/pausa + botón stop) =====
     // Reemplaza los controles nativos feos del navegador por un diseño propio.
     function livePlayerCardHtml(name) {
-      return `
-        <div class="live-player-card">
-          <div class="live-player-info">
-            <span class="live-player-name">${name}</span>
-            <span id="lpStatus" class="live-player-status">Conectando…</span>
-          </div>
-          <div class="live-player-buttons">
-            <button id="lpPlayBtn" class="lp-play-btn" onclick="toggleMiniPlay()" title="Pausar/Reanudar">⏸</button>
-            <button class="lp-stop-btn" onclick="stopAll()" title="Detener">⏹</button>
-          </div>
-        </div>
-      `;
+      // La tarjeta central se retiró: ahora el control vive en la barra inferior a todo el ancho.
+      return '';
     }
 
     // Sincroniza el ícono de la tarjeta blanca Y el de la mini-barra flotante a la vez,
     // para que ambos reflejen siempre el mismo estado real del audio.
+    function setMiniState(state) { // 'connecting' | 'playing' | 'paused'
+      const dot = document.getElementById('miniDot');
+      const st = document.getElementById('miniStatus');
+      if (dot) dot.className = 'dot' + (state === 'playing' ? ' is-playing' : state === 'paused' ? ' is-paused' : '');
+      if (st) st.textContent = state === 'playing' ? 'Sonando ahora' : state === 'paused' ? 'Pausado' : 'Conectando…';
+    }
+
     function syncPlayIcons() {
       if (!activeStreamAudio) return;
+      setMiniState(activeStreamAudio.paused ? 'paused' : 'playing');
       const icon = activeStreamAudio.paused ? '▶' : '⏸';
       const lpBtn = document.getElementById('lpPlayBtn');
       const miniBtn = document.getElementById('miniPlayBtn');
@@ -1741,7 +1753,9 @@
     function bindLivePlayerCard(audioEl) {
       audioEl.addEventListener('play', syncPlayIcons);
       audioEl.addEventListener('pause', syncPlayIcons);
+      audioEl.addEventListener('playing', syncPlayIcons);
       audioEl.addEventListener('waiting', () => {
+        setMiniState('connecting');
         const status = document.getElementById('lpStatus');
         if (status) status.textContent = 'Conectando…';
       });
@@ -1749,10 +1763,9 @@
 
     function checkMiniPlayerVisibility() {
       if (!activeStreamAudio) { hideMiniPlayer(); return; }
-      const container = document.getElementById('playerContainer');
-      const rect = container.getBoundingClientRect();
-      const outOfView = rect.bottom < 0 || rect.top > window.innerHeight;
-      document.getElementById('miniPlayerBar').classList.toggle('is-visible', outOfView);
+      // Siempre visible mientras haya algo sonando (ya no depende del scroll)
+      document.getElementById('miniPlayerBar').classList.add('is-visible');
+      document.body.classList.add('has-mini');
     }
 
     window.addEventListener('scroll', checkMiniPlayerVisibility);
