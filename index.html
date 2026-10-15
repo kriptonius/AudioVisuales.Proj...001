@@ -252,7 +252,7 @@
 
     .radio-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 8px;
       margin-bottom: 12px;
     }
@@ -292,6 +292,9 @@
       text-align: center;
       position: relative;
       padding: 4px 4px;
+      min-width: 0;
+      width: 100%;
+      overflow-wrap: break-word;
     }
 
     .btn-square span.icon { font-size: 1.1rem; }
@@ -321,6 +324,31 @@
       display: none;
       animation: fadeIn 0.3s ease-in-out;
     }
+
+    .live-player-card {
+      background: #F4F6FA;
+      border-radius: 16px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 4px solid #38bdf8;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    }
+    .live-player-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+    .live-player-name {
+      font-family: 'Poppins', sans-serif; font-weight: 700; color: #0F172A;
+      font-size: 0.92rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .live-player-status { font-size: 0.66rem; color: #64748B; }
+    .live-player-buttons { display: flex; gap: 8px; flex: 0 0 auto; }
+    .live-player-buttons button {
+      width: 38px; height: 38px; border-radius: 50%; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; font-size: 0.95rem;
+    }
+    .lp-play-btn { background: #0F172A; color: #fff; }
+    .lp-stop-btn { background: rgba(239,68,68,0.12); color: #ef4444; border: 1px solid rgba(239,68,68,0.3) !important; }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
@@ -957,6 +985,9 @@
       <div style="font-family:'Poppins',sans-serif; font-weight:700; color:#fff; margin:6px 0 2px;">Tienda Virtual</div>
       <p style="font-size:0.78rem; color:#94a3b8; margin:0 0 12px;">Productos de Estrada, directo por WhatsApp.</p>
       <div id="storeGrid" class="store-grid"></div>
+      <p style="font-size:0.65rem; color:#5B6472; text-transform:uppercase; letter-spacing:0.08em; margin:16px 0 4px;">¿Ya elegiste? Paga directo con Yape o Plin</p>
+      <img src="/izipay-qr.jpg" alt="QR Izipay IZI*ODONTUS 5069916" style="width:100%; max-width:200px; border-radius:10px; border:1px solid #232A34; margin-bottom:6px;">
+      <p style="font-size:0.62rem; color:#5B6472; margin:0;">Escanea, paga y avisa por WhatsApp para coordinar la entrega.</p>
     </div>
   </div>
 
@@ -1279,8 +1310,8 @@
 
       mediaSpace.innerHTML = `
         <div class="audio-wrapper">
-          <p style="color: #cbd5e1; font-size: 0.85rem; margin-bottom: 10px;">FANTOMS</p>
-          <audio id="audioEl" controls autoplay>
+          ${livePlayerCardHtml('FANTOMS')}
+          <audio id="audioEl" autoplay style="display:none;">
             <source id="audioSrc" src="${initialUrl}">
           </audio>
           <div class="fantoms-progress-wrap">
@@ -1298,6 +1329,7 @@
       currentStationName = 'FANTOMS';
       scheduleAdRotation();
       showMiniPlayer('FANTOMS');
+      bindLivePlayerCard(audioEl);
 
       // Barra de progreso falsa: sube sola hasta 92% (nunca miente llegando a 100%
       // sin sonar de verdad), y al primer sonido real salta a 100% y se oculta.
@@ -1525,8 +1557,8 @@
         const errorBox = document.getElementById('errorBox');
         mediaSpace.innerHTML = `
           <div class="audio-wrapper">
-            <p style="color: #cbd5e1; font-size: 0.85rem; margin-bottom: 10px;">${station.name}</p>
-            <audio id="audioEl" controls autoplay>
+            ${livePlayerCardHtml(station.name)}
+            <audio id="audioEl" autoplay style="display:none;">
               <source src="${station.url_resolved}">
             </audio>
             <button onclick="showPeruRadioList()" style="margin-top:12px; background:transparent; border:1px solid rgba(255,255,255,0.15); color:#94a3b8; border-radius:8px; padding:6px 12px; font-size:0.75rem; cursor:pointer;">← Volver a la lista</button>
@@ -1536,6 +1568,7 @@
         activeStreamAudio = audioEl;
         scheduleAdRotation();
         showMiniPlayer(station.name);
+        bindLivePlayerCard(audioEl);
         audioEl.addEventListener('error', () => {
           errorBox.style.display = 'block';
           errorBox.innerHTML = `Esa emisora no respondió ahora mismo. Probá otra de la lista.`;
@@ -1576,8 +1609,8 @@
       maybePlayPreRoll(() => {
         mediaSpace.innerHTML = `
           <div class="audio-wrapper">
-            <p style="color: #cbd5e1; font-size: 0.85rem; margin-bottom: 10px;">Stream de audio en vivo</p>
-            <audio id="audioEl" controls autoplay>
+            ${livePlayerCardHtml(station.name)}
+            <audio id="audioEl" autoplay style="display:none;">
               <source src="${station.url_resolved}">
             </audio>
           </div>
@@ -1587,6 +1620,7 @@
         activeStreamAudio = audioEl;
         scheduleAdRotation();
         showMiniPlayer(station.name);
+        bindLivePlayerCard(audioEl);
         audioEl.addEventListener('error', () => {
           errorBox.style.display = 'block';
           errorBox.innerHTML = `
@@ -1624,14 +1658,18 @@
 
       mediaSpace.innerHTML = `
         <div class="audio-wrapper">
-          <p style="color: #cbd5e1; font-size: 0.85rem; margin-bottom: 10px;">Stream de audio en vivo</p>
-          <audio id="audioEl" controls autoplay>
+          ${livePlayerCardHtml(name)}
+          <audio id="audioEl" autoplay style="display:none;">
             <source src="${url}" type="audio/mpeg">
           </audio>
         </div>
       `;
 
       const audioEl = document.getElementById('audioEl');
+      activeStreamAudio = audioEl;
+      scheduleAdRotation();
+      showMiniPlayer(name);
+      bindLivePlayerCard(audioEl);
       audioEl.addEventListener('error', () => {
         if (fallbackSiteUrl) {
           errorBox.style.display = 'block';
@@ -1665,11 +1703,48 @@
       if (!activeStreamAudio) return;
       if (activeStreamAudio.paused) {
         activeStreamAudio.play().catch(() => {});
-        document.getElementById('miniPlayBtn').textContent = '⏸';
       } else {
         activeStreamAudio.pause();
-        document.getElementById('miniPlayBtn').textContent = '▶';
       }
+    }
+
+    // ===== Tarjeta blanca de reproducción (nombre + botón play/pausa + botón stop) =====
+    // Reemplaza los controles nativos feos del navegador por un diseño propio.
+    function livePlayerCardHtml(name) {
+      return `
+        <div class="live-player-card">
+          <div class="live-player-info">
+            <span class="live-player-name">${name}</span>
+            <span id="lpStatus" class="live-player-status">Conectando…</span>
+          </div>
+          <div class="live-player-buttons">
+            <button id="lpPlayBtn" class="lp-play-btn" onclick="toggleMiniPlay()" title="Pausar/Reanudar">⏸</button>
+            <button class="lp-stop-btn" onclick="stopAll()" title="Detener">⏹</button>
+          </div>
+        </div>
+      `;
+    }
+
+    // Sincroniza el ícono de la tarjeta blanca Y el de la mini-barra flotante a la vez,
+    // para que ambos reflejen siempre el mismo estado real del audio.
+    function syncPlayIcons() {
+      if (!activeStreamAudio) return;
+      const icon = activeStreamAudio.paused ? '▶' : '⏸';
+      const lpBtn = document.getElementById('lpPlayBtn');
+      const miniBtn = document.getElementById('miniPlayBtn');
+      const status = document.getElementById('lpStatus');
+      if (lpBtn) lpBtn.textContent = icon;
+      if (miniBtn) miniBtn.textContent = icon;
+      if (status) status.textContent = activeStreamAudio.paused ? 'Pausado' : '🎧 Sonando ahora';
+    }
+
+    function bindLivePlayerCard(audioEl) {
+      audioEl.addEventListener('play', syncPlayIcons);
+      audioEl.addEventListener('pause', syncPlayIcons);
+      audioEl.addEventListener('waiting', () => {
+        const status = document.getElementById('lpStatus');
+        if (status) status.textContent = 'Conectando…';
+      });
     }
 
     function checkMiniPlayerVisibility() {
